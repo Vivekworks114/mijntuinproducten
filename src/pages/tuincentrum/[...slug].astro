@@ -1,0 +1,157 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import tuincentrumData from '../../data/pages/tuincentrum-data.json';
+import citiesData from '../../data/pages/tuincentra-cities.json';
+
+export function getStaticPaths() {
+  const allCities = citiesData as Record<string, Array<{name: string; href: string}>>;
+  const slugs = new Set<string>();
+  for (const group of Object.values(allCities)) {
+    for (const city of group) {
+      const s = city.href.replace(/^\/tuincentrum\//, '').replace(/\/$/, '');
+      if (s) slugs.add(s);
+    }
+  }
+  return [...slugs].map((slug) => ({ params: { slug } }));
+}
+
+const { slug } = Astro.params;
+const pageData = tuincentrumData[slug as keyof typeof tuincentrumData];
+const locationName = pageData?.name || (slug ? slug.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') : '');
+const intro = pageData?.intro || `In ${locationName} vind je diverse tuincentra waar je terecht kunt voor tuinmeubelen, tuingereedschap of decoratie.`;
+const businesses: string[] = pageData?.businesses || [];
+const date = pageData?.date || '';
+const cities = citiesData as Record<string, Array<{name: string; href: string}>>;
+const letters = Object.keys(cities).sort();
+
+const businessGroups: Array<{letter: string; items: string[]}> = [];
+const grouped: Record<string, string[]> = {};
+businesses.forEach((biz) => {
+  const letter = biz.charAt(0).toUpperCase();
+  if (!grouped[letter]) grouped[letter] = [];
+  grouped[letter].push(biz);
+});
+Object.entries(grouped).sort(([a],[b]) => a.localeCompare(b)).forEach(([letter, items]) => {
+  businessGroups.push({ letter, items });
+});
+---
+
+<BaseLayout title={`Tuincentrum ${locationName} - Mijn Tuin Producten`}>
+  <section class="page-hero">
+    <div class="container">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="/">Home</a><span>&gt;</span><a href="/tuincentrum/">Tuincentrum</a><span>&gt;</span><span>{locationName}</span>
+      </nav>
+      <h1>Tuincentrum {locationName}</h1>
+      {date && <p class="page-date"><strong>Laatst bijgewerkt</strong>: {date}</p>}
+    </div>
+  </section>
+
+  <section class="page-content">
+    <div class="container">
+      <div class="content-main">
+        <p class="intro-text">{intro}</p>
+
+        {businesses.length > 0 && (
+          <div class="businesses-section">
+            <h2>Tuinartikelen shoppen in {locationName}</h2>
+            <p>In onderstaand overzicht vind je de tuincentra in jouw woonplaats of de plaats waar je graag naar toe wilt gaan. Veel plezier met winkelen!</p>
+            {businessGroups.map((group) => (
+              <div class="business-group">
+                <h5>{group.letter}</h5>
+                <ul class="business-list">
+                  {group.items.map((biz) => (
+                    <li>{biz}</li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <div class="faq-section">
+          <h2>Veelgestelde vragen over tuincentra in {locationName}</h2>
+          <details class="faq-item">
+            <summary>Welk tuincentrum zit er in {locationName}?</summary>
+            <p>In ons overzicht op deze pagina zie je welk tuincentrum bij jou in {locationName} gevestigd is.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Wat zijn de openingstijden van het tuincentrum in {locationName}?</summary>
+            <p>Om de openingstijden te bekijken raden we je aan om de bedrijfspagina te bekijken van het tuincentrum in {locationName} waar jij naar toe wenst te gaan. Als je klikt op de naam word je doorverwezen naar de bedrijfspagina waar je de contactgegevens en ook de openingstijden kunt bekijken.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Kan ik ook online winkelen bij het tuincentrum in {locationName}?</summary>
+            <p>Om te bekijken of het tuincentrum in {locationName} ook een online webwinkel heeft adviseren we je om door te klikken op de naam van het tuincentrum. Je krijgt dan verdere informatie te zien, zoals de contactgegevens en de website. Hier kun je kijken of je ook online kunt bestellen.</p>
+          </details>
+        </div>
+
+        <div class="cities-section">
+          <h2>Bekijk nog meer tuincentra in Nederland</h2>
+          <div class="cities-grid">
+            {letters.map((letter) => (
+              <div class="cities-column">
+                <h5>{letter}</h5>
+                <ul>
+                  {cities[letter].map((city) => (
+                    <li><a href={city.href}>{city.name}</a></li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .page-hero {
+    background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 100%);
+    padding: 4rem 0 3rem;
+  }
+  .page-hero h1 { color: var(--color-white); margin-bottom: 0.5rem; }
+  .page-date { color: rgba(255, 255, 255, 0.7); font-size: 0.9rem; }
+  .breadcrumb { display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 1rem; flex-wrap: wrap; }
+  .breadcrumb a { color: rgba(255, 255, 255, 0.7); transition: color var(--transition-fast); }
+  .breadcrumb a:hover { color: var(--color-white); }
+  .page-content { padding: 3rem 0 4rem; }
+  .content-main { max-width: 100%; }
+  .intro-text { font-size: 1.05rem; line-height: 1.7; color: var(--color-text); margin-bottom: 2.5rem; }
+  .businesses-section { margin-bottom: 3rem; }
+  .businesses-section h2 { font-family: var(--font-heading); color: var(--color-primary); margin-bottom: 1rem; font-size: 1.5rem; }
+  .businesses-section > p { color: var(--color-text-light); line-height: 1.7; margin-bottom: 1.25rem; }
+  .business-group { margin-bottom: 1rem; }
+  .business-group h5 { font-family: var(--font-heading); font-size: 1rem; color: var(--color-primary); margin-bottom: 0.4rem; }
+  .business-list { list-style: none; padding: 0; display: grid; gap: 0; }
+  .business-list li {
+    padding: 0.85rem 1.25rem;
+    background: var(--color-white);
+    font-weight: 500;
+    color: var(--color-text);
+    border-left: 3px solid var(--color-primary);
+    border-bottom: 1px solid var(--color-border);
+  }
+  .business-list li:last-child { border-bottom: none; }
+  .faq-section { margin-top: 2.5rem; }
+  .faq-section h2 { font-family: var(--font-heading); color: var(--color-primary); margin-bottom: 1.5rem; font-size: 1.5rem; }
+  .faq-item { margin-bottom: 0; border: 1px solid var(--color-border); border-bottom: none; background: var(--color-bg-light); }
+  .faq-item:first-of-type { border-radius: var(--radius-md) var(--radius-md) 0 0; }
+  .faq-item:last-of-type { border-bottom: 1px solid var(--color-border); border-radius: 0 0 var(--radius-md) var(--radius-md); }
+  .faq-item summary { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.25rem; font-size: 0.95rem; font-weight: 600; color: var(--color-text); cursor: pointer; list-style: none; }
+  .faq-item summary::-webkit-details-marker { display: none; }
+  .faq-item summary::after { content: '+'; font-size: 1.3rem; font-weight: 400; color: var(--color-primary); flex-shrink: 0; margin-left: 1rem; }
+  .faq-item[open] summary::after { content: '−'; }
+  .faq-item p { padding: 0 1.25rem 1rem; color: var(--color-text-light); line-height: 1.6; font-size: 0.95rem; margin: 0; }
+  .cities-section { margin-top: 3rem; }
+  .cities-section h2 { font-family: var(--font-heading); color: var(--color-primary); margin-bottom: 1.5rem; font-size: 1.5rem; }
+  .cities-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
+  @media (min-width: 640px) { .cities-grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (min-width: 900px) { .cities-grid { grid-template-columns: repeat(4, 1fr); } }
+  @media (min-width: 1100px) { .cities-grid { grid-template-columns: repeat(6, 1fr); } }
+  .cities-column h5 { font-family: var(--font-heading); font-size: 1.1rem; color: var(--color-primary); margin-bottom: 0.5rem; }
+  .cities-column ul { list-style: none; padding: 0; margin: 0 0 1rem; }
+  .cities-column li { margin-bottom: 0.25rem; }
+  .cities-column a { font-size: 0.82rem; color: var(--color-primary); transition: color var(--transition-fast); }
+  .cities-column a:hover { color: var(--color-primary-dark); text-decoration: underline; }
+</style>

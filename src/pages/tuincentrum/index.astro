@@ -1,0 +1,25 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CategoryPage from '../../components/CategoryPage.astro';
+
+const items = [
+  { label: 'Almere', href: '/tuincentrum/almere/' },
+  { label: 'Amersfoort', href: '/tuincentrum/amersfoort/' },
+  { label: 'Amsterdam', href: '/tuincentrum/amsterdam/' },
+  { label: 'Den Haag', href: '/tuincentrum/den-haag/' },
+  { label: 'Den Helder', href: '/tuincentrum/den-helder/' },
+  { label: 'Drachten', href: '/tuincentrum/drachten/' },
+  { label: 'Hardenberg', href: '/tuincentrum/hardenberg/' },
+  { label: 'Leusden', href: '/tuincentrum/leusden/' },
+  { label: 'Oosterhout', href: '/tuincentrum/oosterhout/' },
+  { label: 'Tilburg', href: '/tuincentrum/tilburg/' },
+];
+---
+
+<BaseLayout title="Tuincentrum - Mijn Tuin Producten" description="Vind de beste tuincentra bij jou in de buurt.">
+  <CategoryPage
+    title="Tuincentrum"
+    description="Vind de beste tuincentra bij jou in de buurt. Wij hebben de beste tuincentra per locatie voor je op een rij gezet."
+    items={items}
+  />
+</BaseLayout>

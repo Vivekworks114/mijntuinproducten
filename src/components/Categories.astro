@@ -1,0 +1,96 @@
+---
+const categories = [
+  { name: 'Planten', href: '/planten/', icon: `<svg viewBox="0 0 40 40" fill="none" stroke="#003E21" stroke-width="1.5"><path d="M20 32V18m0 0c0-3.3 1.3-6.5 3.7-8.8C26 6.9 29.2 5.5 32.5 5.5V12c0 3.3-1.3 6.5-3.7 8.8C26.5 23.1 23.3 24.5 20 24.5m0-6.5c0-3.3-1.3-6.5-3.7-8.8C14 6.9 10.8 5.5 7.5 5.5V12c0 3.3 1.3 6.5 3.7 8.8 2.3 2.3 5.5 3.7 8.8 3.7"/></svg>` },
+  { name: 'Gereedschap', href: '/gereedschap/', icon: `<svg viewBox="0 0 40 40" fill="none" stroke="#003E21" stroke-width="1.5"><path d="M8 32l10-10m14-14l-8 8 3 3 8-8M12 20l-4 4 8 8 4-4"/></svg>` },
+  { name: 'Tuincentra', href: '/tuincentrum/', icon: `<svg viewBox="0 0 40 40" fill="none" stroke="#003E21" stroke-width="1.5"><path d="M20 8c-4 0-7 3-7 3v4s3-3 7-3 7 3 7 3v-4s-3-3-7-3z"/><path d="M8 22h24v12H8z"/><path d="M16 28h8v6h-8z"/></svg>` },
+  { name: 'Decoratie', href: '/decoratie/', icon: `<svg viewBox="0 0 40 40" fill="none" stroke="#003E21" stroke-width="1.5"><path d="M20 6c-5 0-9 4-9 9 0 4 2 7 5 9v4h8v-4c3-2 5-5 5-9 0-5-4-9-9-9z"/><path d="M16 32h8"/></svg>` },
+  { name: 'Tuingerei', href: '/tuingerei/', icon: `<svg viewBox="0 0 40 40" fill="none" stroke="#003E21" stroke-width="1.5"><circle cx="20" cy="16" r="6"/><path d="M20 22v10"/><path d="M15 28h10"/></svg>` },
+  { name: 'Planten overzicht', href: '/planten-zaden/', icon: `<svg viewBox="0 0 40 40" fill="none" stroke="#003E21" stroke-width="1.5"><path d="M20 34V20m0 0c-4-2-8-6-8-12h8m0 12c4-2 8-6 8-12h-8"/></svg>` },
+];
+---
+
+<section class="categories" id="categories">
+  <div class="container">
+    <h2 class="categories__title">Zoek Op Categorie</h2>
+    <div class="categories__grid">
+      {categories.map((cat) => (
+        <a href={cat.href} class="category-card">
+          <div class="category-card__icon" set:html={cat.icon} />
+          <span class="category-card__name">{cat.name}</span>
+        </a>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .categories {
+    padding: 3.5rem 0;
+  }
+
+  .categories__title {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    color: var(--color-text);
+    font-size: clamp(1.5rem, 3vw, 2rem);
+  }
+
+  .categories__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  @media (min-width: 480px) {
+    .categories__grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  @media (min-width: 768px) {
+    .categories__grid {
+      grid-template-columns: repeat(6, 1fr);
+      gap: 1.25rem;
+    }
+  }
+
+  .category-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1.5rem 1rem;
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
+    text-align: center;
+  }
+
+  .category-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--color-primary);
+  }
+
+  .category-card__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    background: #F8D09820;
+    border-radius: 50%;
+  }
+
+  .category-card__icon :global(svg) {
+    width: 32px;
+    height: 32px;
+  }
+
+  .category-card__name {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--color-text);
+  }
+</style>

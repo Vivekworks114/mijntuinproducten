@@ -1,0 +1,83 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { navigation } from '../../data/navigation';
+---
+
+<BaseLayout title="Sitemap - Mijn Tuin Producten" description="Overzicht van alle pagina's op mijntuinproducten.nl">
+  <section class="sitemap-hero">
+    <div class="container">
+      <h1>Sitemap</h1>
+      <p>Overzicht van alle pagina's</p>
+    </div>
+  </section>
+
+  <section class="sitemap-content">
+    <div class="container">
+      <div class="sitemap-grid">
+        {navigation.map((item) => (
+          <div class="sitemap-section">
+            <h3><a href={item.href}>{item.label}</a></h3>
+            {item.children && (
+              <ul>
+                {item.children.map((child) => (
+                  <li><a href={child.href}>{child.label}</a></li>
+                ))}
+              </ul>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .sitemap-hero {
+    background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 100%);
+    padding: 4rem 0 3rem;
+  }
+  .sitemap-hero h1 { color: var(--color-white); margin-bottom: 0.5rem; }
+  .sitemap-hero p { color: rgba(255, 255, 255, 0.8); }
+
+  .sitemap-content { padding: 4rem 0; }
+
+  .sitemap-grid {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 2rem;
+  }
+
+  @media (min-width: 600px) {
+    .sitemap-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (min-width: 1024px) {
+    .sitemap-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  .sitemap-section h3 {
+    font-family: var(--font-heading);
+    margin-bottom: 0.75rem;
+  }
+
+  .sitemap-section h3 a {
+    color: var(--color-primary);
+    transition: opacity var(--transition-fast);
+  }
+
+  .sitemap-section h3 a:hover { opacity: 0.7; }
+
+  .sitemap-section ul { padding-left: 1rem; }
+
+  .sitemap-section li {
+    margin-bottom: 0.4rem;
+  }
+
+  .sitemap-section li a {
+    font-size: 0.9rem;
+    color: var(--color-text-light);
+    transition: color var(--transition-fast);
+  }
+
+  .sitemap-section li a:hover { color: var(--color-primary); }
+</style>

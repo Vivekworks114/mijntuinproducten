@@ -1,0 +1,57 @@
+---
+import ProductCard from './ProductCard.astro';
+
+const plants = [
+  { title: 'Bloemzaden', description: 'Bekijk de beste bloemzaden', image: '/images/products/bloemzaden.jpg', href: '/planten-zaden/bloemzaden/' },
+  { title: 'Kamerplanten', description: 'Bekijk de beste kamerplanten', image: '/images/products/kamerplanten.jpg', href: '/planten-zaden/kamerplanten/' },
+  { title: 'Kruidenzaden', description: 'Bekijk de beste kruidenzaden', image: '/images/products/kruidenzaden.jpg', href: '/planten-zaden/kruidenzaden/' },
+  { title: 'Tuinplanten', description: 'Bekijk de beste tuinplanten', image: '/images/products/tuinplanten.jpg', href: '/planten-zaden/tuinplanten/' },
+];
+---
+
+<section class="plants-section">
+  <div class="container">
+    <h2 class="section-title">Planten</h2>
+    <div class="plants-grid">
+      {plants.map((item) => (
+        <ProductCard
+          title={item.title}
+          description={item.description}
+          image={item.image}
+          href={item.href}
+        />
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .plants-section {
+    padding: 4rem 0;
+    background: var(--color-white);
+  }
+
+  .section-title {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    color: var(--color-text);
+  }
+
+  .plants-grid {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 1.5rem;
+  }
+
+  @media (min-width: 480px) {
+    .plants-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 768px) {
+    .plants-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+</style>

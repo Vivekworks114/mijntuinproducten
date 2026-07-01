@@ -1,0 +1,24 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CategoryPage from '../../components/CategoryPage.astro';
+
+const items = [
+  { label: 'Tuingereedschapsetjes', href: '/gereedschap/tuingereedschapsetjes/' },
+  { label: 'Gazongereedschap', href: '/gereedschap/gazongereedschap/' },
+  { label: 'Snoeigereedschap', href: '/gereedschap/snoeigereedschap/' },
+  { label: 'Zaaggereedschap', href: '/gereedschap/zaaggereedschap/' },
+  { label: 'Hogedrukreiniger', href: '/gereedschap/hogedrukreiniger/' },
+  { label: 'Heggenschaar', href: '/gereedschap/heggenschaar/' },
+  { label: 'Tuinruimer', href: '/gereedschap/tuinruimer/' },
+  { label: 'Grasmaaier', href: '/gereedschap/grasmaaier/' },
+  { label: 'Bladblazer', href: '/gereedschap/bladblazer/' },
+];
+---
+
+<BaseLayout title="Gereedschap - Mijn Tuin Producten" description="Bekijk het beste tuingereedschap voor elk type klus.">
+  <CategoryPage
+    title="Gereedschap"
+    description="Bekijk het beste tuingereedschap voor elk type klus. Van heggenscharen tot grasmaaiers."
+    items={items}
+  />
+</BaseLayout>

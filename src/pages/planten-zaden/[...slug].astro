@@ -1,0 +1,44 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export function getStaticPaths() {
+  const items = ['plantenbescherming', 'zaai-pootgoed', 'kamerplanten', 'vijverplanten', 'tuinplanten', 'kruidenzaden', 'groentezaden', 'bloemzaden', 'graszaden', 'bemesting'];
+  return items.map((slug) => ({ params: { slug } }));
+}
+
+const { slug } = Astro.params;
+const itemName = slug ? slug.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') : '';
+---
+
+<BaseLayout title={`${itemName} - Mijn Tuin Producten`}>
+  <section class="page-hero">
+    <div class="container">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="/">Home</a><span>/</span><a href="/planten-zaden/">Planten & Zaden</a><span>/</span><span>{itemName}</span>
+      </nav>
+      <h1>{itemName}</h1>
+      <p>Bekijk de beste {itemName.toLowerCase()} voor je tuin.</p>
+    </div>
+  </section>
+  <section class="page-content">
+    <div class="container">
+      <div class="content-card">
+        <h2>De beste {itemName.toLowerCase()}</h2>
+        <p>Ontdek de beste {itemName.toLowerCase()} in onze uitgebreide review. Wij hebben alles voor je vergeleken.</p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .page-hero { background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 100%); padding: 4rem 0 3rem; }
+  .page-hero h1 { color: var(--color-white); margin-bottom: 0.75rem; }
+  .page-hero p { color: rgba(255, 255, 255, 0.8); font-size: 1.05rem; }
+  .breadcrumb { display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 1rem; flex-wrap: wrap; }
+  .breadcrumb a { color: rgba(255, 255, 255, 0.7); transition: color var(--transition-fast); }
+  .breadcrumb a:hover { color: var(--color-white); }
+  .page-content { padding: 4rem 0; }
+  .content-card { max-width: 750px; background: var(--color-white); border-radius: var(--radius-lg); padding: 2.5rem; box-shadow: var(--shadow-card); }
+  .content-card h2 { font-family: var(--font-heading); color: var(--color-primary); margin-bottom: 1rem; }
+  .content-card p { color: var(--color-text-light); line-height: 1.7; margin-bottom: 1rem; }
+</style>

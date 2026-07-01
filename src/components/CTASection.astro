@@ -1,0 +1,115 @@
+---
+---
+
+<section class="cta-section">
+  <div class="container">
+    <div class="cta__grid">
+      <div class="cta__content">
+        <h2 class="cta__title">Vind producten snel en simpel</h2>
+        <p class="cta__text">
+          Individuele reviews voor specifieke producten, hier kun je alles vinden over producten binnen een categorie. Wij plaatsen dagelijks nieuwe reviews voor producten die passen bij jouw behoefte.
+        </p>
+        <a href="/blog/" class="cta__button">
+          Bekijk alle reviews
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+          </svg>
+        </a>
+      </div>
+      <div class="cta__illustration">
+        <img src="/images/hero/cta-illustration.png" alt="Tuinproducten" loading="lazy" />
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .cta-section {
+    padding: 4rem 0;
+  }
+
+  .cta__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    align-items: center;
+    gap: 2rem;
+    background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 100%);
+    border-radius: var(--radius-xl);
+    padding: 3rem 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta__grid::before {
+    content: '';
+    position: absolute;
+    top: -30%;
+    right: -10%;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  @media (min-width: 768px) {
+    .cta__grid {
+      grid-template-columns: 1fr auto;
+      padding: 3.5rem 3rem;
+    }
+  }
+
+  .cta__content {
+    position: relative;
+    z-index: 1;
+  }
+
+  .cta__title {
+    color: var(--color-white);
+    margin-bottom: 1rem;
+    font-size: clamp(1.5rem, 3vw, 2rem);
+  }
+
+  .cta__text {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    max-width: 500px;
+  }
+
+  .cta__button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.875rem 2rem;
+    background: var(--color-accent);
+    color: var(--color-text);
+    font-weight: 600;
+    font-size: 0.95rem;
+    border-radius: var(--radius-lg);
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
+  }
+
+  .cta__button:hover {
+    background: var(--color-accent-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(248, 208, 152, 0.35);
+  }
+
+  .cta__illustration {
+    display: none;
+    position: relative;
+    z-index: 1;
+  }
+
+  .cta__illustration img {
+    max-width: 250px;
+    filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.2));
+  }
+
+  @media (min-width: 768px) {
+    .cta__illustration {
+      display: block;
+    }
+  }
+</style>

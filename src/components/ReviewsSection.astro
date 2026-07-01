@@ -1,0 +1,57 @@
+---
+import ProductCard from './ProductCard.astro';
+
+const reviews = [
+  { title: 'Tuinhuisje', description: 'Bekijk de beste tuinhuisjes', image: '/images/products/tuinhuisje.jpg', href: '/verbouwing/tuinhuisje/' },
+  { title: 'Plantenbakken', description: 'Bekijk de beste plantenbakken', image: '/images/products/plantenbakken.jpg', href: '/decoratie/plantenbakken/' },
+  { title: 'Loungesets', description: 'Bekijk de beste loungesets', image: '/images/products/loungesets.jpg', href: '/decoratie/' },
+  { title: 'Schuttingdeur', description: 'Bekijk de beste schuttingdeur', image: '/images/products/schuttingdeur.jpg', href: '/verbouwing/schuttingdeur/' },
+];
+---
+
+<section class="reviews-section">
+  <div class="container">
+    <h2 class="section-title">Laatste Reviews</h2>
+    <div class="reviews-grid">
+      {reviews.map((item) => (
+        <ProductCard
+          title={item.title}
+          description={item.description}
+          image={item.image}
+          href={item.href}
+        />
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .reviews-section {
+    padding: 4rem 0;
+    background: var(--color-white);
+  }
+
+  .section-title {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    color: var(--color-text);
+  }
+
+  .reviews-grid {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 1.5rem;
+  }
+
+  @media (min-width: 480px) {
+    .reviews-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 768px) {
+    .reviews-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+</style>

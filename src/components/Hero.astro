@@ -1,0 +1,134 @@
+---
+interface Props {
+  title: string;
+  subtitle?: string;
+  ctaText?: string;
+  ctaHref?: string;
+  showIllustration?: boolean;
+}
+
+const { title, subtitle, ctaText, ctaHref = '#categories', showIllustration = true } = Astro.props;
+---
+
+<section class="hero">
+  <div class="container">
+    <div class="hero__grid">
+      <div class="hero__content">
+        <h1 class="hero__title">{title}</h1>
+        {subtitle && <p class="hero__subtitle">{subtitle}</p>}
+        {ctaText && (
+          <a href={ctaHref} class="hero__cta">
+            {ctaText}
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+            </svg>
+          </a>
+        )}
+      </div>
+      {showIllustration && (
+        <div class="hero__illustration">
+          <div class="hero__circle"></div>
+          <img src="/images/hero/hero-illustration.png" alt="Tuinproducten illustratie" loading="eager" />
+        </div>
+      )}
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    background: var(--color-white);
+    padding: 3rem 0 2rem;
+    overflow: hidden;
+  }
+
+  .hero__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  @media (min-width: 768px) {
+    .hero {
+      padding: 4rem 0 3rem;
+    }
+
+    .hero__grid {
+      grid-template-columns: 1.2fr 1fr;
+      gap: 3rem;
+    }
+  }
+
+  .hero__content {
+    animation: fadeInUp 0.8s ease;
+  }
+
+  .hero__title {
+    font-size: clamp(1.75rem, 5vw, 3rem);
+    color: var(--color-primary);
+    margin-bottom: 1rem;
+    line-height: 1.15;
+  }
+
+  .hero__subtitle {
+    font-size: clamp(0.9rem, 1.5vw, 1.05rem);
+    color: var(--color-text-light);
+    margin-bottom: 2rem;
+    line-height: 1.7;
+    max-width: 500px;
+  }
+
+  .hero__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.875rem 2rem;
+    background: var(--color-primary);
+    color: var(--color-white);
+    font-weight: 600;
+    font-size: 0.95rem;
+    border-radius: var(--radius-md);
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
+  }
+
+  .hero__cta:hover {
+    background: var(--color-primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(25, 81, 43, 0.2);
+  }
+
+  .hero__illustration {
+    position: relative;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 1s ease 0.3s forwards;
+    opacity: 0;
+  }
+
+  .hero__circle {
+    position: absolute;
+    width: 85%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: #F8D09820;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .hero__illustration img {
+    position: relative;
+    width: 100%;
+    max-width: 380px;
+    margin: 0 auto;
+    z-index: 1;
+  }
+
+  @media (min-width: 768px) {
+    .hero__illustration {
+      display: flex;
+    }
+  }
+</style>

@@ -1,0 +1,190 @@
+---
+import { footerLocations, footerTuincentra, footerReviews, footerPlanten } from '../data/navigation';
+import { getCollection } from 'astro:content';
+
+const latestPosts = (await getCollection('blog')).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+).slice(0, 6);
+---
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer__top">
+      <div class="footer__brand">
+        <a href="/" class="footer__logo">
+          <img src="/images/logo.png" alt="Mijn Tuin Producten" width="160" height="36" />
+        </a>
+        <p class="footer__description">
+          Bij MijnTuinProducten.nl kun je terecht voor reviews voor alle soorten tuinproducten. Onze redactie bestaat uit mensen met groene vingers om iedereen met een hart voor tuinieren.
+        </p>
+        <p class="footer__tagline">Wekelijks schrijven wij reviews over de nieuwste en beste tuinproducten. Alle producten worden uitgebreid getest.</p>
+        <div class="footer__links-inline">
+          <a href="/blog/">Blog</a>
+          <a href="/sitemap/">Sitemap</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer__grid">
+      <div class="footer__column">
+        <h4 class="footer__heading">Tuincentrum locaties</h4>
+        <ul class="footer__list">
+          {footerLocations.map((loc) => (
+            <li><a href="/tuincentrum/">{loc}</a></li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="footer__column">
+        <h4 class="footer__heading">Tuincentra</h4>
+        <ul class="footer__list">
+          {footerTuincentra.map((item) => (
+            <li><a href={item.href}>{item.label}</a></li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="footer__column">
+        <h4 class="footer__heading">Laatste blogs</h4>
+        <ul class="footer__list">
+          {latestPosts.map((post) => (
+            <li><a href={`/blog/${post.id}/`}>{post.data.title}</a></li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="footer__column">
+        <h4 class="footer__heading">Reviews</h4>
+        <ul class="footer__list">
+          {footerReviews.map((item) => (
+            <li><a href={item.href}>{item.label}</a></li>
+          ))}
+        </ul>
+
+        <h4 class="footer__heading footer__heading--mt">Planten</h4>
+        <ul class="footer__list">
+          {footerPlanten.slice(0, 5).map((item) => (
+            <li><a href={item.href}>{item.label}</a></li>
+          ))}
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer__bottom">
+      <p>&copy; {new Date().getFullYear()} Alle rechten voorbehouden</p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    background: #181818;
+    color: rgba(255, 255, 255, 0.8);
+    padding: 4rem 0 0;
+  }
+
+  .footer__top {
+    padding-bottom: 3rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 3rem;
+  }
+
+  .footer__brand {
+    max-width: 500px;
+  }
+
+  .footer__logo {
+    display: inline-block;
+    margin-bottom: 1rem;
+  }
+
+  .footer__logo img {
+    height: 32px;
+    width: auto;
+    filter: brightness(0) invert(1);
+  }
+
+  .footer__description {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin-bottom: 0.75rem;
+  }
+
+  .footer__tagline {
+    font-size: 0.85rem;
+    opacity: 0.7;
+    margin-bottom: 1rem;
+  }
+
+  .footer__links-inline {
+    display: flex;
+    gap: 1.5rem;
+  }
+
+  .footer__links-inline a {
+    font-size: 0.85rem;
+    color: var(--color-accent);
+    transition: opacity var(--transition-fast);
+  }
+
+  .footer__links-inline a:hover {
+    opacity: 0.8;
+  }
+
+  .footer__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    padding-bottom: 3rem;
+  }
+
+  @media (min-width: 480px) {
+    .footer__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 768px) {
+    .footer__grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  .footer__heading {
+    font-family: var(--font-heading);
+    font-size: 1rem;
+    color: var(--color-accent);
+    margin-bottom: 1rem;
+  }
+
+  .footer__heading--mt {
+    margin-top: 1.5rem;
+  }
+
+  .footer__list li {
+    margin-bottom: 0.5rem;
+  }
+
+  .footer__list a {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+    transition: color var(--transition-fast);
+    display: block;
+    line-height: 1.4;
+  }
+
+  .footer__list a:hover {
+    color: var(--color-accent);
+  }
+
+  .footer__bottom {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 1.5rem 0;
+    text-align: center;
+  }
+
+  .footer__bottom p {
+    font-size: 0.85rem;
+    opacity: 0.6;
+  }
+</style>

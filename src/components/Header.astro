@@ -1,0 +1,488 @@
+---
+import { navigation } from '../data/navigation';
+---
+
+<header class="site-header">
+  <div class="container">
+    <div class="site-header__inner">
+      <a href="/" class="site-header__logo" aria-label="Mijn Tuin Producten - Home">
+        <img src="/images/logo.png" alt="Mijn Tuin Producten" width="220" height="48" />
+      </a>
+
+      <div class="site-header__right">
+        <nav class="nav__desktop" aria-label="Hoofdnavigatie">
+          <ul class="nav__list">
+            {navigation.map((item) => (
+              <li class={`nav__item ${item.children ? 'has-dropdown' : ''}`}>
+                <a href={item.href} class="nav__link">
+                  {item.label}
+                  {item.children && (
+                    <svg class="nav__chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                      <path d="m6 9 6 6 6-6"/>
+                    </svg>
+                  )}
+                </a>
+                {item.children && (
+                  <ul class="nav__dropdown">
+                    {item.children.map((child) => (
+                      <li><a href={child.href} class="nav__dropdown-link">{child.label}</a></li>
+                    ))}
+                  </ul>
+                )}
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </div>
+
+      <div class="site-header__controls">
+        <button class="search-toggle" aria-label="Zoeken" type="button">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/>
+            <path d="m21 21-4.35-4.35"/>
+          </svg>
+        </button>
+
+        <button class="burger" aria-label="Menu openen" aria-expanded="false" type="button">
+          <span class="burger__line"></span>
+          <span class="burger__line"></span>
+          <span class="burger__line"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search overlay -->
+  <div class="search-overlay" aria-hidden="true">
+    <div class="container">
+      <form class="search-form" action="/blog/" method="get">
+        <input type="search" name="s" class="search-form__input" placeholder="Zoeken..." aria-label="Zoeken" />
+        <button type="submit" class="search-form__btn" aria-label="Zoeken">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/>
+            <path d="m21 21-4.35-4.35"/>
+          </svg>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Mobile drawer -->
+  <div class="nav__backdrop" aria-hidden="true"></div>
+  <nav class="nav__drawer" aria-label="Mobiel menu" aria-hidden="true">
+    <div class="nav__drawer-header">
+      <span class="nav__drawer-title">Menu</span>
+      <button class="nav__drawer-close" aria-label="Menu sluiten" type="button">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
+        </svg>
+      </button>
+    </div>
+    <ul class="nav__drawer-list">
+      {navigation.map((item) => (
+        <li class={`nav__drawer-item ${item.children ? 'has-children' : ''}`}>
+          <div class="nav__drawer-row">
+            <a href={item.href} class="nav__drawer-link">{item.label}</a>
+            {item.children && (
+              <button class="nav__drawer-toggle" aria-label={`${item.label} submenu`} type="button">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="m6 9 6 6 6-6"/>
+                </svg>
+              </button>
+            )}
+          </div>
+          {item.children && (
+            <ul class="nav__drawer-sub">
+              {item.children.map((child) => (
+                <li><a href={child.href} class="nav__drawer-sublink">{child.label}</a></li>
+              ))}
+            </ul>
+          )}
+        </li>
+      ))}
+    </ul>
+  </nav>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: var(--z-header);
+    background: var(--color-white);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .site-header__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 80px;
+    gap: 1.5rem;
+  }
+
+  .site-header__logo img {
+    height: 40px;
+    width: auto;
+  }
+
+  .site-header__right {
+    display: none;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  @media (min-width: 1024px) {
+    .site-header__right {
+      display: flex;
+    }
+  }
+
+  /* Mobile controls: search + burger always visible together */
+  .site-header__controls {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    min-height: 40px;
+  }
+
+  /* Desktop Navigation */
+  .nav__desktop {
+    display: flex;
+  }
+
+  .nav__list {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0;
+    justify-content: flex-end;
+  }
+
+  .nav__item {
+    position: relative;
+  }
+
+  .nav__link {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.5rem 0.7rem;
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--color-text);
+    white-space: nowrap;
+    transition: color var(--transition-fast);
+  }
+
+  .nav__link:hover {
+    color: var(--color-primary);
+  }
+
+  .nav__chevron {
+    opacity: 0.6;
+    transition: transform var(--transition-fast);
+  }
+
+  .has-dropdown:hover .nav__chevron {
+    transform: rotate(180deg);
+  }
+
+  .has-dropdown:hover .nav__dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  .nav__dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    min-width: 220px;
+    padding: 0.5rem;
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(8px);
+    transition: all var(--transition-fast);
+    z-index: 10;
+  }
+
+  .nav__dropdown-link {
+    display: block;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+    color: var(--color-text);
+    border-radius: var(--radius-sm);
+    transition: background var(--transition-fast), color var(--transition-fast);
+  }
+
+  .nav__dropdown-link:hover {
+    background: var(--color-bg-section);
+    color: var(--color-primary);
+  }
+
+  /* Search toggle */
+  .search-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    color: var(--color-text);
+    transition: background var(--transition-fast), color var(--transition-fast);
+  }
+
+  .search-toggle:hover {
+    background: var(--color-bg-section);
+    color: var(--color-primary);
+  }
+
+  /* Burger */
+  .burger {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+    gap: 5px;
+    border-radius: var(--radius-sm);
+  }
+
+  .burger__line {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: var(--color-text);
+    border-radius: 2px;
+    transition: transform var(--transition-fast), opacity var(--transition-fast);
+  }
+
+  .burger.is-active .burger__line:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .burger.is-active .burger__line:nth-child(2) { opacity: 0; }
+  .burger.is-active .burger__line:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  @media (min-width: 1024px) {
+    .burger { display: none; }
+  }
+
+  /* Search overlay */
+  .search-overlay {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--color-white);
+    padding: 1rem 0;
+    box-shadow: var(--shadow-md);
+    border-top: 1px solid var(--color-border);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all var(--transition-fast);
+  }
+
+  .search-overlay.is-active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  .search-form {
+    display: flex;
+    gap: 0.5rem;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  .search-form__input {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-size: 1rem;
+    outline: none;
+    transition: border-color var(--transition-fast);
+  }
+
+  .search-form__input:focus {
+    border-color: var(--color-primary);
+  }
+
+  .search-form__btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    background: var(--color-primary);
+    color: var(--color-white);
+    border-radius: var(--radius-md);
+    transition: background var(--transition-fast);
+  }
+
+  .search-form__btn:hover {
+    background: var(--color-primary-dark);
+  }
+
+  /* Mobile drawer */
+  .nav__backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: var(--z-backdrop);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--transition-base);
+  }
+
+  .nav__backdrop.is-active { opacity: 1; visibility: visible; }
+
+  .nav__drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: min(320px, 85vw);
+    height: 100vh;
+    background: var(--color-white);
+    z-index: var(--z-drawer);
+    transform: translateX(100%);
+    transition: transform var(--transition-base);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .nav__drawer.is-active { transform: translateX(0); }
+
+  .nav__drawer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .nav__drawer-title {
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+    color: var(--color-primary);
+  }
+
+  .nav__drawer-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    color: var(--color-text);
+    transition: background var(--transition-fast);
+  }
+
+  .nav__drawer-close:hover { background: var(--color-bg-section); }
+
+  .nav__drawer-list { padding: 0.5rem 0; }
+
+  .nav__drawer-row { display: flex; align-items: center; }
+
+  .nav__drawer-link {
+    flex: 1;
+    display: block;
+    padding: 0.75rem 1.5rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--color-text);
+    transition: color var(--transition-fast);
+  }
+
+  .nav__drawer-link:hover { color: var(--color-primary); }
+
+  .nav__drawer-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    color: var(--color-text-light);
+    transition: transform var(--transition-fast), color var(--transition-fast);
+  }
+
+  .nav__drawer-toggle.is-active { transform: rotate(180deg); color: var(--color-primary); }
+
+  .nav__drawer-sub {
+    display: none;
+    padding-left: 1.5rem;
+    background: var(--color-bg-light);
+  }
+
+  .nav__drawer-sub.is-active { display: block; }
+
+  .nav__drawer-sublink {
+    display: block;
+    padding: 0.5rem 1.5rem;
+    font-size: 0.875rem;
+    color: var(--color-text-light);
+    transition: color var(--transition-fast);
+  }
+
+  .nav__drawer-sublink:hover { color: var(--color-primary); }
+
+  @media (min-width: 1024px) {
+    .nav__drawer, .nav__backdrop { display: none; }
+  }
+</style>
+
+<script>
+  const burger = document.querySelector('.burger');
+  const drawer = document.querySelector('.nav__drawer');
+  const backdrop = document.querySelector('.nav__backdrop');
+  const drawerClose = document.querySelector('.nav__drawer-close');
+  const searchToggle = document.querySelector('.search-toggle');
+  const searchOverlay = document.querySelector('.search-overlay');
+
+  function openDrawer() {
+    burger?.classList.add('is-active');
+    drawer?.classList.add('is-active');
+    drawer?.setAttribute('aria-hidden', 'false');
+    backdrop?.classList.add('is-active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeDrawer() {
+    burger?.classList.remove('is-active');
+    drawer?.classList.remove('is-active');
+    drawer?.setAttribute('aria-hidden', 'true');
+    backdrop?.classList.remove('is-active');
+    document.body.style.overflow = '';
+  }
+
+  burger?.addEventListener('click', () => {
+    drawer?.classList.contains('is-active') ? closeDrawer() : openDrawer();
+  });
+
+  backdrop?.addEventListener('click', closeDrawer);
+  drawerClose?.addEventListener('click', closeDrawer);
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDrawer(); });
+
+  document.querySelectorAll('.nav__drawer-toggle').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const sub = btn.closest('.nav__drawer-item')?.querySelector('.nav__drawer-sub');
+      const isActive = sub?.classList.contains('is-active');
+      document.querySelectorAll('.nav__drawer-sub').forEach(s => s.classList.remove('is-active'));
+      document.querySelectorAll('.nav__drawer-toggle').forEach(b => b.classList.remove('is-active'));
+      if (!isActive) { sub?.classList.add('is-active'); btn.classList.add('is-active'); }
+    });
+  });
+
+  searchToggle?.addEventListener('click', () => {
+    searchOverlay?.classList.toggle('is-active');
+    if (searchOverlay?.classList.contains('is-active')) {
+      searchOverlay.querySelector('input')?.focus();
+    }
+  });
+</script>

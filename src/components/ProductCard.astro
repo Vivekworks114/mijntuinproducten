@@ -1,0 +1,103 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  image: string;
+  href: string;
+  ctaText?: string;
+}
+
+const { title, description, image, href, ctaText = 'Lees Meer' } = Astro.props;
+---
+
+<article class="product-card">
+  <a href={href} class="product-card__link">
+    <div class="product-card__image-wrap">
+      <img src={image} alt={title} class="product-card__image" loading="lazy" />
+    </div>
+    <div class="product-card__body">
+      <h4 class="product-card__title">{title}</h4>
+      <p class="product-card__desc">{description}</p>
+      <span class="product-card__cta">{ctaText}</span>
+    </div>
+  </a>
+</article>
+
+<style>
+  .product-card {
+    background: var(--color-white);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+    overflow: hidden;
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  }
+
+  .product-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .product-card__link {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    text-align: center;
+  }
+
+  .product-card__image-wrap {
+    aspect-ratio: 1;
+    overflow: hidden;
+    background: var(--color-white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+  }
+
+  .product-card__image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: transform var(--transition-base);
+  }
+
+  .product-card:hover .product-card__image {
+    transform: scale(1.05);
+  }
+
+  .product-card__body {
+    padding: 1rem 1.25rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .product-card__title {
+    font-family: var(--font-heading);
+    font-size: 1.1rem;
+    color: var(--color-text);
+  }
+
+  .product-card__desc {
+    font-size: 0.85rem;
+    color: var(--color-text-light);
+    line-height: 1.5;
+  }
+
+  .product-card__cta {
+    display: inline-block;
+    margin-top: 0.5rem;
+    padding: 0.6rem 1.5rem;
+    background: var(--color-primary);
+    color: var(--color-white);
+    font-size: 0.85rem;
+    font-weight: 500;
+    border-radius: var(--radius-md);
+    transition: background var(--transition-fast);
+  }
+
+  .product-card:hover .product-card__cta {
+    background: var(--color-primary-dark);
+  }
+</style>

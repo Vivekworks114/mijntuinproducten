@@ -1,0 +1,25 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CategoryPage from '../../components/CategoryPage.astro';
+
+const items = [
+  { label: 'Combisystemen stelen', href: '/overig/combisystemen-stelen/' },
+  { label: 'Vochtmeters planten', href: '/overig/vochtmeters-planten/' },
+  { label: 'Bodemverwerker', href: '/overig/bodemverwerker/' },
+  { label: 'Sneeuwruimers', href: '/overig/sneeuwruimers/' },
+  { label: 'Veegmachine', href: '/overig/veegmachine/' },
+  { label: 'Plantenzakken', href: '/overig/plantenzakken/' },
+  { label: 'Deurklopper', href: '/overig/deurklopper/' },
+  { label: 'Wandlamp', href: '/overig/wandlamp/' },
+  { label: 'Windgong', href: '/overig/windgong/' },
+  { label: 'Tuinkleding', href: '/overig/tuinkleding/' },
+];
+---
+
+<BaseLayout title="Overig - Mijn Tuin Producten" description="Overige tuinproducten en accessoires.">
+  <CategoryPage
+    title="Overig"
+    description="Overige tuinproducten en accessoires die je tuin compleet maken."
+    items={items}
+  />
+</BaseLayout>

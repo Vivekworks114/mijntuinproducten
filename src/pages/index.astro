@@ -1,0 +1,27 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/Hero.astro';
+import Categories from '../components/Categories.astro';
+import ReviewsSection from '../components/ReviewsSection.astro';
+import AboutSection from '../components/AboutSection.astro';
+import ToolsSection from '../components/ToolsSection.astro';
+import PlantsSection from '../components/PlantsSection.astro';
+import BlogSection from '../components/BlogSection.astro';
+import CTASection from '../components/CTASection.astro';
+---
+
+<BaseLayout>
+  <Hero
+    title="De website voor mensen met groene vingers"
+    subtitle="mijntuinproducten.nl schrijft dagelijks reviews voor mensen die op zoek zijn naar de beste producten voor het tuinieren."
+    ctaText="Lees Meer"
+    ctaHref="#categories"
+  />
+  <Categories />
+  <ReviewsSection />
+  <AboutSection />
+  <ToolsSection />
+  <PlantsSection />
+  <BlogSection />
+  <CTASection />
+</BaseLayout>

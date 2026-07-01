@@ -1,0 +1,88 @@
+---
+import BlogCard from './BlogCard.astro';
+import { fallbackImage } from '../data/fallback-images';
+import { getCollection } from 'astro:content';
+
+const posts = (await getCollection('blog')).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+).slice(0, 6);
+---
+
+<section class="blog-section">
+  <div class="container">
+    <h2 class="section-title">Laatste blogs van Mijntuinproducten.nl</h2>
+    <div class="blog-grid">
+      {posts.map((post) => (
+        <BlogCard
+          title={post.data.title}
+          excerpt={post.data.description}
+          image={post.data.featuredImage || fallbackImage(post.id)}
+          date={post.data.pubDate.toLocaleDateString('nl-NL', { year: 'numeric', month: 'long', day: 'numeric' })}
+          href={`/blog/${post.id}/`}
+        />
+      ))}
+    </div>
+    <div class="blog-section__more">
+      <a href="/blog/" class="blog-section__link">
+        Bekijk alle blogs
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .blog-section {
+    padding: 4rem 0;
+    background: var(--color-bg-light);
+  }
+
+  .section-title {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    color: var(--color-text);
+  }
+
+  .blog-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  @media (min-width: 600px) {
+    .blog-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .blog-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .blog-section__more {
+    text-align: center;
+    margin-top: 2.5rem;
+  }
+
+  .blog-section__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: var(--color-primary);
+    color: var(--color-white);
+    font-weight: 600;
+    font-size: 0.9rem;
+    border-radius: var(--radius-md);
+    transition: background var(--transition-fast), transform var(--transition-fast);
+  }
+
+  .blog-section__link:hover {
+    background: var(--color-primary-dark);
+    transform: translateY(-2px);
+  }
+</style>

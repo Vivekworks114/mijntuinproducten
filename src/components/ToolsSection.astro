@@ -1,0 +1,57 @@
+---
+import ProductCard from './ProductCard.astro';
+
+const tools = [
+  { title: 'Heggenschaar', description: 'Bekijk de beste heggenschaar', image: '/images/products/heggenschaar.jpg', href: '/gereedschap/heggenschaar/' },
+  { title: 'Bladblazers', description: 'Bekijk de beste bladblazers', image: '/images/products/bladblazer.jpg', href: '/gereedschap/bladblazer/' },
+  { title: 'Grasmaaier', description: 'Bekijk de beste grasmaaiers', image: '/images/products/grasmaaier.jpg', href: '/gereedschap/grasmaaier/' },
+  { title: 'Hogedrukreiniger', description: 'Bekijk de beste hogedrukreinigers', image: '/images/products/hogedrukreiniger.jpg', href: '/gereedschap/hogedrukreiniger/' },
+];
+---
+
+<section class="tools-section">
+  <div class="container">
+    <h2 class="section-title">Gereedschap</h2>
+    <div class="tools-grid">
+      {tools.map((item) => (
+        <ProductCard
+          title={item.title}
+          description={item.description}
+          image={item.image}
+          href={item.href}
+        />
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .tools-section {
+    padding: 4rem 0;
+    background: var(--color-white);
+  }
+
+  .section-title {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    color: var(--color-text);
+  }
+
+  .tools-grid {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 1.5rem;
+  }
+
+  @media (min-width: 480px) {
+    .tools-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 768px) {
+    .tools-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+</style>

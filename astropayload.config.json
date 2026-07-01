@@ -1,0 +1,7 @@
+{
+  "version": 1,
+  "tenantSlug": "mijntuinproducten-nl",
+  "modules": ["blog"],
+  "blogContentPath": "src/content/blog",
+  "blogFileExtension": "mdx"
+}
