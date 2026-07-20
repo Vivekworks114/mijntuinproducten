@@ -1,24 +1,16 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import CategoryPage from '../../components/CategoryPage.astro';
+import { navigation } from '../../data/navigation';
 
-const items = [
-  { label: 'Tuingereedschapsetjes', href: '/gereedschap/tuingereedschapsetjes/' },
-  { label: 'Gazongereedschap', href: '/gereedschap/gazongereedschap/' },
-  { label: 'Snoeigereedschap', href: '/gereedschap/snoeigereedschap/' },
-  { label: 'Zaaggereedschap', href: '/gereedschap/zaaggereedschap/' },
-  { label: 'Hogedrukreiniger', href: '/gereedschap/hogedrukreiniger/' },
-  { label: 'Heggenschaar', href: '/gereedschap/heggenschaar/' },
-  { label: 'Tuinruimer', href: '/gereedschap/tuinruimer/' },
-  { label: 'Grasmaaier', href: '/gereedschap/grasmaaier/' },
-  { label: 'Bladblazer', href: '/gereedschap/bladblazer/' },
-];
+const section = navigation.find((item) => item.href === '/gereedschap/');
+const items = section?.children ?? [];
 ---
 
-<BaseLayout title="Gereedschap - Mijn Tuin Producten" description="Bekijk het beste tuingereedschap voor elk type klus.">
+<BaseLayout title="Gereedschap - Mijn Tuin Producten" description="Bekijk de beste tuingereedschappen.">
   <CategoryPage
     title="Gereedschap"
-    description="Bekijk het beste tuingereedschap voor elk type klus. Van heggenscharen tot grasmaaiers."
+    description="Vind het juiste gereedschap voor jouw tuin. Van grasmaaiers tot heggenscharen."
     items={items}
   />
 </BaseLayout>

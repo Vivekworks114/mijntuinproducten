@@ -1,25 +1,16 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import CategoryPage from '../../components/CategoryPage.astro';
+import { navigation } from '../../data/navigation';
 
-const items = [
-  { label: 'Garagedeuropener', href: '/verbouwing/garagedeuropener/' },
-  { label: 'Containerombouw', href: '/verbouwing/containerombouw/' },
-  { label: 'Schuttingdeur', href: '/verbouwing/schuttingdeur/' },
-  { label: 'Vijveronderhoud', href: '/verbouwing/vijveronderhoud/' },
-  { label: 'Schuttingpalen', href: '/verbouwing/schuttingpalen/' },
-  { label: 'Afrasteringen', href: '/verbouwing/afrasteringen/' },
-  { label: 'Tuinafdakje', href: '/verbouwing/tuinafdakje/' },
-  { label: 'Tuinhuisje', href: '/verbouwing/tuinhuisje/' },
-  { label: 'Tuinkasten', href: '/verbouwing/tuinkasten/' },
-  { label: 'Schutting', href: '/verbouwing/schutting/' },
-];
+const section = navigation.find((item) => item.href === '/verbouwing/');
+const items = section?.children ?? [];
 ---
 
-<BaseLayout title="Verbouwing - Mijn Tuin Producten" description="Alles voor je tuinverbouwing en -aanleg.">
+<BaseLayout title="Verbouwing - Mijn Tuin Producten" description="Producten voor verbouwing in en om je tuin.">
   <CategoryPage
     title="Verbouwing"
-    description="Alles voor je tuinverbouwing. Van schuttingen tot tuinhuisjes en garages."
+    description="Van schuttingen tot tuinhuisjes — producten voor je verbouwing."
     items={items}
   />
 </BaseLayout>

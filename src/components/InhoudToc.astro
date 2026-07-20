@@ -1,0 +1,134 @@
+---
+export interface TocItem {
+  id: string;
+  text: string;
+  children?: TocItem[];
+}
+
+interface Props {
+  items: TocItem[];
+  id?: string;
+}
+
+const { items, id = 'inhoud-body' } = Astro.props;
+---
+
+{items.length > 0 && (
+  <nav class="inhoud" aria-label="Inhoudsopgave">
+    <button
+      type="button"
+      class="inhoud__header"
+      aria-expanded="true"
+      aria-controls={id}
+    >
+      <span class="inhoud__title">Inhoud</span>
+      <svg class="inhoud__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+        <path d="m18 15-6-6-6 6"/>
+      </svg>
+    </button>
+    <div id={id} class="inhoud__body">
+      <ol class="inhoud__list">
+        {items.map((item) => (
+          <li class="inhoud__item">
+            <a href={`#${item.id}`}>{item.text}</a>
+            {item.children && item.children.length > 0 && (
+              <ol class="inhoud__sublist">
+                {item.children.map((child) => (
+                  <li><a href={`#${child.id}`}>{child.text}</a></li>
+                ))}
+              </ol>
+            )}
+          </li>
+        ))}
+      </ol>
+    </div>
+  </nav>
+)}
+
+<script>
+  document.querySelectorAll('.inhoud__header').forEach((btn) => {
+    if (btn.dataset.bound === '1') return;
+    btn.dataset.bound = '1';
+    btn.addEventListener('click', () => {
+      const expanded = btn.getAttribute('aria-expanded') === 'true';
+      btn.setAttribute('aria-expanded', String(!expanded));
+      btn.closest('.inhoud')?.classList.toggle('is-collapsed', expanded);
+    });
+  });
+</script>
+
+<style is:global>
+  .inhoud {
+    margin: 0;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    background: var(--color-white);
+    box-shadow: var(--shadow-card);
+  }
+  .inhoud__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: var(--color-primary);
+    color: var(--color-white);
+    font-family: var(--font-heading);
+    font-size: 1.05rem;
+    cursor: pointer;
+    border: none;
+    text-align: left;
+  }
+  .inhoud__header:hover { background: var(--color-primary-dark); }
+  .inhoud__chevron {
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
+  }
+  .inhoud.is-collapsed .inhoud__chevron {
+    transform: rotate(180deg);
+  }
+  .inhoud__body {
+    max-height: min(60vh, 480px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 0.85rem 1rem 1rem;
+    scrollbar-width: thin;
+  }
+  .inhoud.is-collapsed .inhoud__body {
+    display: none;
+  }
+  .inhoud__list {
+    list-style: disc;
+    margin: 0 0 0 1.1rem;
+    padding: 0;
+    color: var(--color-text);
+  }
+  .inhoud__item {
+    margin-bottom: 0.35rem;
+  }
+  .inhoud__list > .inhoud__item > a {
+    font-weight: 600;
+    color: var(--color-text);
+    text-decoration: none;
+  }
+  .inhoud__list > .inhoud__item > a:hover {
+    color: var(--color-primary);
+    text-decoration: underline;
+  }
+  .inhoud__sublist {
+    list-style: disc;
+    margin: 0.35rem 0 0.5rem 1.1rem;
+    padding: 0;
+  }
+  .inhoud__sublist a {
+    font-weight: 400;
+    color: var(--color-text-light);
+    text-decoration: none;
+    font-size: 0.92rem;
+  }
+  .inhoud__sublist a:hover {
+    color: var(--color-primary);
+    text-decoration: underline;
+  }
+</style>

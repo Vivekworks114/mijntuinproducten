@@ -7,7 +7,17 @@ import http from 'http';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const projectRoot = join(__dirname, '..');
 
-const imageUrls = JSON.parse(readFileSync(join(projectRoot, 'scripts', 'image-urls.json'), 'utf-8'));
+const urlFiles = ['all-image-urls.json', 'scraped-image-urls.json', 'image-urls.json'];
+let imageUrls = [];
+for (const file of urlFiles) {
+  const full = join(projectRoot, 'scripts', file);
+  if (existsSync(full)) {
+    imageUrls = JSON.parse(readFileSync(full, 'utf-8'));
+    console.log(`Using ${file}`);
+    break;
+  }
+}
+imageUrls = [...new Set(imageUrls.filter((u) => typeof u === 'string' && u.includes('/wp-content/uploads/')))];
 
 console.log(`Downloading ${imageUrls.length} images...`);
 

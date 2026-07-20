@@ -1,25 +1,16 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import CategoryPage from '../../components/CategoryPage.astro';
+import { navigation } from '../../data/navigation';
 
-const items = [
-  { label: 'Buitenmat', href: '/tuingerei/buitenmat/' },
-  { label: 'Elektrische barbecue', href: '/tuingerei/elektrische-barbecue/' },
-  { label: 'Flexibele tuinslang', href: '/tuingerei/flexibele-tuinslang/' },
-  { label: 'Hogedrukreiniger', href: '/tuingerei/hogedrukreiniger/' },
-  { label: 'Houten tuinkast', href: '/tuingerei/houten-tuinkast/' },
-  { label: 'Opbergbox tuinkussens', href: '/tuingerei/opbergbox-tuinkussens/' },
-  { label: 'Parasolhoes', href: '/tuingerei/parasolhoes/' },
-  { label: 'Tuinhuisje met overkapping', href: '/tuingerei/tuinhuisje-met-overkapping/' },
-  { label: 'Tuinmeubelbeschermers', href: '/tuingerei/tuinmeubelbeschermers/' },
-  { label: 'Tuinstoel', href: '/tuingerei/tuinstoel/' },
-];
+const section = navigation.find((item) => item.href === '/tuingerei/');
+const items = section?.children ?? [];
 ---
 
-<BaseLayout title="Tuingerei - Mijn Tuin Producten" description="Alles voor je tuin van barbecues tot tuinhuisjes.">
+<BaseLayout title="Tuingerei - Mijn Tuin Producten" description="Handig tuingereedschap en accessoires.">
   <CategoryPage
     title="Tuingerei"
-    description="Alles voor je tuin, van barbecues tot tuinhuisjes en alles daartussen."
+    description="Praktisch tuingereedschap en accessoires voor een verzorgde tuin."
     items={items}
   />
 </BaseLayout>

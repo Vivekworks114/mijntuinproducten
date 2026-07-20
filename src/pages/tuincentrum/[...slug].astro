@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import InhoudToc from '../../components/InhoudToc.astro';
 import tuincentrumData from '../../data/pages/tuincentrum-data.json';
 import citiesData from '../../data/pages/tuincentra-cities.json';
 
@@ -34,6 +35,14 @@ businesses.forEach((biz) => {
 Object.entries(grouped).sort(([a],[b]) => a.localeCompare(b)).forEach(([letter, items]) => {
   businessGroups.push({ letter, items });
 });
+
+const tocItems = [
+  ...(businesses.length > 0
+    ? [{ id: 'tuinartikelen', text: `Tuinartikelen shoppen in ${locationName}` }]
+    : []),
+  { id: 'faq', text: `Veelgestelde vragen over tuincentra in ${locationName}` },
+  { id: 'meer-tuincentra', text: 'Bekijk nog meer tuincentra in Nederland' },
+];
 ---
 
 <BaseLayout title={`Tuincentrum ${locationName} - Mijn Tuin Producten`}>
@@ -48,12 +57,12 @@ Object.entries(grouped).sort(([a],[b]) => a.localeCompare(b)).forEach(([letter, 
   </section>
 
   <section class="page-content">
-    <div class="container">
+    <div class="container review-layout review-layout--with-toc">
       <div class="content-main">
         <p class="intro-text">{intro}</p>
 
         {businesses.length > 0 && (
-          <div class="businesses-section">
+          <div class="businesses-section" id="tuinartikelen">
             <h2>Tuinartikelen shoppen in {locationName}</h2>
             <p>In onderstaand overzicht vind je de tuincentra in jouw woonplaats of de plaats waar je graag naar toe wilt gaan. Veel plezier met winkelen!</p>
             {businessGroups.map((group) => (
@@ -69,7 +78,7 @@ Object.entries(grouped).sort(([a],[b]) => a.localeCompare(b)).forEach(([letter, 
           </div>
         )}
 
-        <div class="faq-section">
+        <div class="faq-section" id="faq">
           <h2>Veelgestelde vragen over tuincentra in {locationName}</h2>
           <details class="faq-item">
             <summary>Welk tuincentrum zit er in {locationName}?</summary>
@@ -85,7 +94,7 @@ Object.entries(grouped).sort(([a],[b]) => a.localeCompare(b)).forEach(([letter, 
           </details>
         </div>
 
-        <div class="cities-section">
+        <div class="cities-section" id="meer-tuincentra">
           <h2>Bekijk nog meer tuincentra in Nederland</h2>
           <div class="cities-grid">
             {letters.map((letter) => (
@@ -101,6 +110,10 @@ Object.entries(grouped).sort(([a],[b]) => a.localeCompare(b)).forEach(([letter, 
           </div>
         </div>
       </div>
+
+      <aside class="review-sidebar">
+        <InhoudToc items={tocItems} id={`inhoud-${slug}`} />
+      </aside>
     </div>
   </section>
 </BaseLayout>
@@ -116,9 +129,27 @@ Object.entries(grouped).sort(([a],[b]) => a.localeCompare(b)).forEach(([letter, 
   .breadcrumb a { color: rgba(255, 255, 255, 0.7); transition: color var(--transition-fast); }
   .breadcrumb a:hover { color: var(--color-white); }
   .page-content { padding: 3rem 0 4rem; }
-  .content-main { max-width: 100%; }
+  .review-layout--with-toc {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    align-items: start;
+  }
+  .review-sidebar { order: -1; }
+  @media (min-width: 960px) {
+    .review-layout--with-toc {
+      grid-template-columns: minmax(0, 1fr) 280px;
+      gap: 2rem;
+    }
+    .review-sidebar {
+      order: 0;
+      position: sticky;
+      top: 6rem;
+    }
+  }
+  .content-main { min-width: 0; max-width: 100%; }
   .intro-text { font-size: 1.05rem; line-height: 1.7; color: var(--color-text); margin-bottom: 2.5rem; }
-  .businesses-section { margin-bottom: 3rem; }
+  .businesses-section { margin-bottom: 3rem; scroll-margin-top: 6rem; }
   .businesses-section h2 { font-family: var(--font-heading); color: var(--color-primary); margin-bottom: 1rem; font-size: 1.5rem; }
   .businesses-section > p { color: var(--color-text-light); line-height: 1.7; margin-bottom: 1.25rem; }
   .business-group { margin-bottom: 1rem; }
@@ -133,7 +164,7 @@ Object.entries(grouped).sort(([a],[b]) => a.localeCompare(b)).forEach(([letter, 
     border-bottom: 1px solid var(--color-border);
   }
   .business-list li:last-child { border-bottom: none; }
-  .faq-section { margin-top: 2.5rem; }
+  .faq-section { margin-top: 2.5rem; scroll-margin-top: 6rem; }
   .faq-section h2 { font-family: var(--font-heading); color: var(--color-primary); margin-bottom: 1.5rem; font-size: 1.5rem; }
   .faq-item { margin-bottom: 0; border: 1px solid var(--color-border); border-bottom: none; background: var(--color-bg-light); }
   .faq-item:first-of-type { border-radius: var(--radius-md) var(--radius-md) 0 0; }
@@ -143,7 +174,7 @@ Object.entries(grouped).sort(([a],[b]) => a.localeCompare(b)).forEach(([letter, 
   .faq-item summary::after { content: '+'; font-size: 1.3rem; font-weight: 400; color: var(--color-primary); flex-shrink: 0; margin-left: 1rem; }
   .faq-item[open] summary::after { content: '−'; }
   .faq-item p { padding: 0 1.25rem 1rem; color: var(--color-text-light); line-height: 1.6; font-size: 0.95rem; margin: 0; }
-  .cities-section { margin-top: 3rem; }
+  .cities-section { margin-top: 3rem; scroll-margin-top: 6rem; }
   .cities-section h2 { font-family: var(--font-heading); color: var(--color-primary); margin-bottom: 1.5rem; font-size: 1.5rem; }
   .cities-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
   @media (min-width: 640px) { .cities-grid { grid-template-columns: repeat(3, 1fr); } }

@@ -1,0 +1,231 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import InhoudToc from './InhoudToc.astro';
+import type { TocItem } from './InhoudToc.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+  h1?: string;
+  date?: string;
+  breadcrumb?: { label: string; href?: string }[];
+  contentHtml: string;
+  showToc?: boolean;
+}
+
+interface HeadingTocItem extends TocItem {
+  level: 2 | 3;
+  children: HeadingTocItem[];
+}
+
+const {
+  title,
+  description = '',
+  h1,
+  date,
+  breadcrumb = [],
+  contentHtml,
+  showToc = true,
+} = Astro.props;
+
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+    .slice(0, 80);
+}
+
+function stripTags(html: string): string {
+  return html.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+}
+
+function processContent(html: string): { html: string; toc: TocItem[] } {
+  const used = new Set<string>();
+  const toc: HeadingTocItem[] = [];
+  let currentH2: HeadingTocItem | null = null;
+
+  const nextHtml = html.replace(
+    /<h([23])([^>]*)>([\s\S]*?)<\/h\1>/gi,
+    (_match, levelStr: string, attrs: string, inner: string) => {
+      const level = Number(levelStr) as 2 | 3;
+      const text = stripTags(inner);
+      if (!text) return _match;
+
+      let id = '';
+      const idMatch = attrs.match(/\sid=["']([^"']+)["']/i);
+      if (idMatch) {
+        id = idMatch[1];
+      } else {
+        const base = slugify(text) || `section-${used.size + 1}`;
+        id = base;
+        let n = 2;
+        while (used.has(id)) {
+          id = `${base}-${n++}`;
+        }
+      }
+      used.add(id);
+
+      const item: HeadingTocItem = { id, text, level, children: [] };
+      if (level === 2) {
+        currentH2 = item;
+        toc.push(item);
+      } else if (currentH2) {
+        currentH2.children.push(item);
+      } else {
+        toc.push(item);
+      }
+
+      if (idMatch) return _match;
+      return `<h${level}${attrs} id="${id}">${inner}</h${level}>`;
+    }
+  );
+
+  return { html: nextHtml, toc };
+}
+
+const { html: processedHtml, toc } = processContent(contentHtml);
+const hasToc = showToc && toc.length > 0;
+---
+
+<BaseLayout title={title} description={description}>
+  <article class="review-page">
+    <header class="review-hero">
+      <div class="container">
+        {breadcrumb.length > 0 && (
+          <nav class="breadcrumb" aria-label="Breadcrumb">
+            {breadcrumb.map((crumb, i) => (
+              <>
+                {i > 0 && <span>/</span>}
+                {crumb.href ? <a href={crumb.href}>{crumb.label}</a> : <span>{crumb.label}</span>}
+              </>
+            ))}
+          </nav>
+        )}
+        <h1>{h1 || title}</h1>
+        {date && <p class="review-date">Laatst bijgewerkt: {date}</p>}
+      </div>
+    </header>
+    <section class="review-body">
+      <div class={`container review-layout ${hasToc ? 'review-layout--with-toc' : ''}`}>
+        <div class="review-content" set:html={processedHtml} />
+
+        {hasToc && (
+          <aside class="review-sidebar">
+            <InhoudToc items={toc} />
+          </aside>
+        )}
+      </div>
+    </section>
+  </article>
+</BaseLayout>
+
+<style is:global>
+  .review-hero {
+    background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 100%);
+    padding: 3.5rem 0 2.5rem;
+  }
+  .review-hero h1 {
+    color: var(--color-white);
+    margin-bottom: 0.5rem;
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    max-width: 900px;
+  }
+  .review-date {
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 0.95rem;
+  }
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+  .breadcrumb a {
+    color: rgba(255, 255, 255, 0.7);
+    transition: color var(--transition-fast);
+  }
+  .breadcrumb a:hover { color: var(--color-white); }
+
+  .review-body { padding: 3rem 0 4rem; }
+
+  .review-layout--with-toc {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    align-items: start;
+  }
+
+  .review-sidebar {
+    order: -1;
+  }
+
+  @media (min-width: 960px) {
+    .review-layout--with-toc {
+      grid-template-columns: minmax(0, 1fr) 280px;
+      gap: 2rem;
+    }
+    .review-sidebar {
+      order: 0;
+      position: sticky;
+      top: 6rem;
+    }
+  }
+
+  .review-content {
+    min-width: 0;
+    background: var(--color-white);
+    border-radius: var(--radius-lg);
+    padding: 2rem 2.25rem;
+    box-shadow: var(--shadow-card);
+  }
+  .review-content h1 { display: none; }
+  .review-content h2 {
+    font-family: var(--font-heading);
+    color: var(--color-primary);
+    margin: 2rem 0 0.85rem;
+    font-size: 1.35rem;
+    scroll-margin-top: 6rem;
+  }
+  .review-content h3 {
+    font-family: var(--font-heading);
+    color: var(--color-primary-dark);
+    margin: 1.75rem 0 0.65rem;
+    font-size: 1.15rem;
+    scroll-margin-top: 6rem;
+  }
+  .review-content p {
+    color: var(--color-text-light);
+    line-height: 1.75;
+    margin-bottom: 1rem;
+  }
+  .review-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--radius-md, 8px);
+    margin: 0.75rem 0 1.25rem;
+    display: block;
+  }
+  .review-content a {
+    color: var(--color-primary);
+    text-decoration: underline;
+  }
+  .review-content ul, .review-content ol {
+    margin: 0 0 1rem 1.25rem;
+    color: var(--color-text-light);
+    line-height: 1.7;
+  }
+  .review-content .zbmp-category-links ul {
+    list-style: none;
+    margin-left: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+  }
+  .review-content .zbmp-breadcrumb { display: none; }
+</style>

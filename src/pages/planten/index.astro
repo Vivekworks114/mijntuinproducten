@@ -1,19 +1,10 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import CategoryPage from '../../components/CategoryPage.astro';
+import { navigation } from '../../data/navigation';
 
-const items = [
-  { label: 'Aglaonema Pictum Tricolor', href: '/planten/aglaonema-pictum-tricolor/' },
-  { label: 'Alocasia Azlanii', href: '/planten/alocasia-azlanii/' },
-  { label: 'Alocasia Frydek Variegata', href: '/planten/alocasia-frydek-variegata/' },
-  { label: 'Calathea Medaillon', href: '/planten/calathea-medaillon/' },
-  { label: 'Ficus Shivereana Moonshine', href: '/planten/ficus-shivereana-moonshine/' },
-  { label: 'Honingboom', href: '/planten/honingboom/' },
-  { label: 'Hoya Burtoniae', href: '/planten/hoya-burtoniae/' },
-  { label: 'Hoya Sigillatis', href: '/planten/hoya-sigillatis/' },
-  { label: 'Philodendron Joepii', href: '/planten/philodendron-joepii/' },
-  { label: 'Sansevieria Zeylanica', href: '/planten/sansevieria-zeylanica/' },
-];
+const section = navigation.find((item) => item.href === '/planten/');
+const items = section?.children ?? [];
 ---
 
 <BaseLayout title="Planten - Mijn Tuin Producten" description="Ontdek de mooiste planten voor in en rond je huis.">

@@ -199,6 +199,10 @@ import { navigation } from '../data/navigation';
     top: 100%;
     left: 0;
     min-width: 220px;
+    max-height: min(70vh, 420px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
     padding: 0.5rem;
     background: var(--color-white);
     border: 1px solid var(--color-border);
@@ -207,8 +211,19 @@ import { navigation } from '../data/navigation';
     opacity: 0;
     visibility: hidden;
     transform: translateY(8px);
-    transition: all var(--transition-fast);
+    transition: opacity var(--transition-fast), visibility var(--transition-fast), transform var(--transition-fast);
     z-index: 10;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border) transparent;
+  }
+
+  .nav__dropdown::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .nav__dropdown::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    border-radius: 3px;
   }
 
   .nav__dropdown-link {

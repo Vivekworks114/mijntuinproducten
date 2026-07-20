@@ -1,0 +1,43 @@
+---
+import ScrapedContentPage from '../components/ScrapedContentPage.astro';
+import { readdirSync, readFileSync, existsSync } from 'node:fs';
+import { join } from 'node:path';
+
+export function getStaticPaths() {
+  const dataDir = join(process.cwd(), 'src/data/scraped/bedrijf');
+  if (!existsSync(dataDir)) return [];
+  const reserved = new Set([
+    'blog', 'tuincentrum', 'planten', 'decoratie', 'gereedschap', 'overig',
+    'planten-zaden', 'tuingerei', 'verbouwing', 'sitemap', 'plant',
+    'planten-overzicht', 'images',
+  ]);
+  return readdirSync(dataDir)
+    .filter((f) => f.endsWith('.json'))
+    .map((f) => f.replace(/\.json$/, ''))
+    .filter((slug) => !reserved.has(slug) && !slug.startsWith('beste-'))
+    .map((slug) => ({ params: { slug }, props: { file: `${slug}.json` } }));
+}
+
+const { file } = Astro.props;
+const data = JSON.parse(
+  readFileSync(join(process.cwd(), 'src/data/scraped/bedrijf', file), 'utf-8')
+);
+
+let html = data.contentHtml as string;
+html = html.replace(/<h1[\s\S]*?<\/h1>/i, '');
+html = html.replace(/<p>\s*Laatst bijgewerkt:[\s\S]*?<\/p>/i, '');
+---
+
+<ScrapedContentPage
+  title={data.title}
+  description={data.description}
+  h1={data.h1}
+  date={data.date}
+  breadcrumb={[
+    { label: 'Home', href: '/' },
+    { label: 'Tuincentrum', href: '/tuincentrum/' },
+    { label: data.h1 || data.title },
+  ]}
+  contentHtml={html}
+  showToc={true}
+/>

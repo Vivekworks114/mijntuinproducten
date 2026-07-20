@@ -1,0 +1,39 @@
+---
+import ScrapedContentPage from '../components/ScrapedContentPage.astro';
+import { readdirSync, readFileSync, existsSync } from 'node:fs';
+import { join } from 'node:path';
+
+export function getStaticPaths() {
+  const dataDir = join(process.cwd(), 'src/data/scraped/beste');
+  if (!existsSync(dataDir)) return [];
+  return readdirSync(dataDir)
+    .filter((f) => f.endsWith('.json'))
+    .map((f) => {
+      const full = f.replace(/\.json$/, '');
+      const param = full.startsWith('beste-') ? full.slice('beste-'.length) : full;
+      return { params: { slug: param }, props: { file: f } };
+    });
+}
+
+const { file } = Astro.props;
+const data = JSON.parse(
+  readFileSync(join(process.cwd(), 'src/data/scraped/beste', file), 'utf-8')
+);
+
+let html = data.contentHtml as string;
+html = html.replace(/<h1[\s\S]*?<\/h1>/i, '');
+html = html.replace(/<p>\s*Laatst bijgewerkt:[\s\S]*?<\/p>/i, '');
+---
+
+<ScrapedContentPage
+  title={data.title}
+  description={data.description}
+  h1={data.h1}
+  date={data.date}
+  breadcrumb={[
+    { label: 'Home', href: '/' },
+    { label: data.h1 || data.title },
+  ]}
+  contentHtml={html}
+  showToc={true}
+/>

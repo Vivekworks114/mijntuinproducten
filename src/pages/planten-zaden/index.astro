@@ -1,25 +1,16 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import CategoryPage from '../../components/CategoryPage.astro';
+import { navigation } from '../../data/navigation';
 
-const items = [
-  { label: 'Plantenbescherming', href: '/planten-zaden/plantenbescherming/' },
-  { label: 'Zaai Pootgoed', href: '/planten-zaden/zaai-pootgoed/' },
-  { label: 'Kamerplanten', href: '/planten-zaden/kamerplanten/' },
-  { label: 'Vijverplanten', href: '/planten-zaden/vijverplanten/' },
-  { label: 'Tuinplanten', href: '/planten-zaden/tuinplanten/' },
-  { label: 'Kruidenzaden', href: '/planten-zaden/kruidenzaden/' },
-  { label: 'Groentezaden', href: '/planten-zaden/groentezaden/' },
-  { label: 'Bloemzaden', href: '/planten-zaden/bloemzaden/' },
-  { label: 'Graszaden', href: '/planten-zaden/graszaden/' },
-  { label: 'Bemesting', href: '/planten-zaden/bemesting/' },
-];
+const section = navigation.find((item) => item.href === '/planten-zaden/');
+const items = section?.children ?? [];
 ---
 
-<BaseLayout title="Planten & Zaden - Mijn Tuin Producten" description="Alles over planten en zaden voor je tuin.">
+<BaseLayout title="Planten & zaden - Mijn Tuin Producten" description="Planten, zaden en bemesting voor je tuin.">
   <CategoryPage
-    title="Planten & Zaden"
-    description="Alles over planten en zaden voor je tuin. Van bloemzaden tot tuinplanten."
+    title="Planten & zaden"
+    description="Alles voor het zaaien en kweken: zaden, plantenbescherming en bemesting."
     items={items}
   />
 </BaseLayout>

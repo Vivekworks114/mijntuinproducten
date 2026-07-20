@@ -30,7 +30,7 @@ const latestPosts = (await getCollection('blog')).sort(
         <h4 class="footer__heading">Tuincentrum locaties</h4>
         <ul class="footer__list">
           {footerLocations.map((loc) => (
-            <li><a href="/tuincentrum/">{loc}</a></li>
+            <li><a href={loc.href}>{loc.label}</a></li>
           ))}
         </ul>
       </div>

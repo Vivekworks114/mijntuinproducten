@@ -1,13 +1,32 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { navigation } from '../../data/navigation';
+import { getCollection } from 'astro:content';
+import { readdirSync, existsSync } from 'node:fs';
+import { join } from 'node:path';
+import tuincentraCities from '../../data/pages/tuincentra-cities.json';
+
+const posts = (await getCollection('blog')).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+
+const besteDir = join(process.cwd(), 'src/data/scraped/beste');
+const plantDir = join(process.cwd(), 'src/data/scraped/plant');
+const bestePages = existsSync(besteDir)
+  ? readdirSync(besteDir).filter((f) => f.endsWith('.json')).map((f) => f.replace(/\.json$/, ''))
+  : [];
+const plantPages = existsSync(plantDir)
+  ? readdirSync(plantDir).filter((f) => f.endsWith('.json')).map((f) => f.replace(/\.json$/, ''))
+  : [];
+
+const cityLinks = Object.values(tuincentraCities).flat();
 ---
 
 <BaseLayout title="Sitemap - Mijn Tuin Producten" description="Overzicht van alle pagina's op mijntuinproducten.nl">
   <section class="sitemap-hero">
     <div class="container">
       <h1>Sitemap</h1>
-      <p>Overzicht van alle pagina's</p>
+      <p>Overzicht van alle pagina's op mijntuinproducten.nl</p>
     </div>
   </section>
 
@@ -27,6 +46,42 @@ import { navigation } from '../../data/navigation';
           </div>
         ))}
       </div>
+
+      <div class="sitemap-block">
+        <h2>Top 10 reviews ({bestePages.length})</h2>
+        <ul class="sitemap-columns">
+          {bestePages.map((slug) => (
+            <li><a href={`/${slug}/`}>{slug.replace(/^beste-/, '').replace(/-/g, ' ')}</a></li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="sitemap-block">
+        <h2>Planten ({plantPages.length})</h2>
+        <ul class="sitemap-columns">
+          {plantPages.map((slug) => (
+            <li><a href={`/plant/${slug}/`}>{slug.replace(/-/g, ' ')}</a></li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="sitemap-block">
+        <h2>Blog ({posts.length})</h2>
+        <ul class="sitemap-columns">
+          {posts.map((post) => (
+            <li><a href={`/blog/${post.id}/`}>{post.data.title}</a></li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="sitemap-block">
+        <h2>Tuincentrum locaties ({cityLinks.length})</h2>
+        <ul class="sitemap-columns">
+          {cityLinks.map((city) => (
+            <li><a href={city.href}>{city.name}</a></li>
+          ))}
+        </ul>
+      </div>
     </div>
   </section>
 </BaseLayout>
@@ -45,6 +100,7 @@ import { navigation } from '../../data/navigation';
     display: grid;
     grid-template-columns: repeat(1, 1fr);
     gap: 2rem;
+    margin-bottom: 3rem;
   }
 
   @media (min-width: 600px) {
@@ -80,4 +136,33 @@ import { navigation } from '../../data/navigation';
   }
 
   .sitemap-section li a:hover { color: var(--color-primary); }
+
+  .sitemap-block {
+    margin-top: 2.5rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(0,0,0,0.08);
+  }
+  .sitemap-block h2 {
+    font-family: var(--font-heading);
+    color: var(--color-primary);
+    margin-bottom: 1rem;
+    font-size: 1.35rem;
+  }
+  .sitemap-columns {
+    columns: 1;
+    gap: 1.5rem;
+    padding-left: 1rem;
+  }
+  @media (min-width: 600px) { .sitemap-columns { columns: 2; } }
+  @media (min-width: 1024px) { .sitemap-columns { columns: 3; } }
+  .sitemap-columns li {
+    margin-bottom: 0.35rem;
+    break-inside: avoid;
+  }
+  .sitemap-columns a {
+    font-size: 0.88rem;
+    color: var(--color-text-light);
+    text-transform: capitalize;
+  }
+  .sitemap-columns a:hover { color: var(--color-primary); }
 </style>

@@ -1,19 +1,10 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import CategoryPage from '../../components/CategoryPage.astro';
+import { navigation } from '../../data/navigation';
 
-const items = [
-  { label: 'Tuinmeubelsbeschermers', href: '/decoratie/tuinmeubelsbeschermers/' },
-  { label: 'Sfeerverlichting buiten', href: '/decoratie/sfeerverlichting-buiten/' },
-  { label: 'Staandeplantenbakken', href: '/decoratie/staandeplantenbakken/' },
-  { label: 'Windmolen voor thuis', href: '/decoratie/windmolen-voor-thuis/' },
-  { label: 'Tuinwanddecoratie', href: '/decoratie/tuinwanddecoratie/' },
-  { label: 'Plantenbakhouder', href: '/decoratie/plantenbakhouder/' },
-  { label: 'Hangingbaskets', href: '/decoratie/hangingbaskets/' },
-  { label: 'Plantenmanden', href: '/decoratie/plantenmanden/' },
-  { label: 'Plantenschalen', href: '/decoratie/plantenschalen/' },
-  { label: 'Plantenbakken', href: '/decoratie/plantenbakken/' },
-];
+const section = navigation.find((item) => item.href === '/decoratie/');
+const items = section?.children ?? [];
 ---
 
 <BaseLayout title="Decoratie - Mijn Tuin Producten" description="Bekijk de beste tuindecoratie en maak je tuin nog mooier.">
