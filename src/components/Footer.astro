@@ -48,7 +48,7 @@ const latestPosts = (await getCollection('blog')).sort(
         <h4 class="footer__heading">Laatste blogs</h4>
         <ul class="footer__list">
           {latestPosts.map((post) => (
-            <li><a href={`/${post.id}/`}>{post.data.title}</a></li>
+            <li><a href={`/blog/${post.id}/`}>{post.data.title}</a></li>
           ))}
         </ul>
       </div>

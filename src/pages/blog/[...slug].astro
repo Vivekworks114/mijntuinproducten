@@ -1,31 +1,67 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import BlogListing from '../../components/BlogListing.astro';
-import { getCollection } from 'astro:content';
+import BlogPostLayout from '../../layouts/BlogPostLayout.astro';
+import { getCollection, render } from 'astro:content';
 
 const PAGE_SIZE = 12;
 
 export async function getStaticPaths() {
+  const posts = (await getCollection('blog')).sort(
+    (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+  );
   const PAGE_SIZE = 12;
-  const posts = (await getCollection('blog')).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
   const totalPages = Math.ceil(posts.length / PAGE_SIZE);
+
   return [
-    ...Array.from({ length: Math.max(totalPages - 1, 0) }, (_, index) => ({ params: { slug: String(index + 2) }, props: { type: 'page', posts: posts.slice((index + 1) * PAGE_SIZE, (index + 2) * PAGE_SIZE), page: index + 2, totalPages } })),
-    ...posts.flatMap((entry) => [
-      { params: { slug: entry.id }, props: { type: 'redirect', target: `/${entry.id}/` } },
-      { params: { slug: `article/${entry.id}` }, props: { type: 'redirect', target: `/${entry.id}/` } },
-    ]),
+    ...Array.from({ length: Math.max(totalPages - 1, 0) }, (_, index) => ({
+      params: { slug: String(index + 2) },
+      props: {
+        type: 'page' as const,
+        posts: posts.slice((index + 1) * PAGE_SIZE, (index + 2) * PAGE_SIZE),
+        page: index + 2,
+        totalPages,
+      },
+    })),
+    ...posts.map((entry) => ({
+      params: { slug: entry.id },
+      props: { type: 'post' as const, entry },
+    })),
+    ...posts.map((entry) => ({
+      params: { slug: `article/${entry.id}` },
+      props: { type: 'redirect' as const, target: `/blog/${entry.id}/` },
+    })),
   ];
 }
 
-const { type, posts, page, totalPages, target } = Astro.props;
-if (type === 'redirect') return Astro.redirect(target, 301);
+const { type, posts, page, totalPages, target, entry } = Astro.props;
+
+if (type === 'redirect') {
+  return Astro.redirect(target, 301);
+}
+
+let Content: Awaited<ReturnType<typeof render>>['Content'] | undefined;
+if (type === 'post') {
+  ({ Content } = await render(entry));
+}
 ---
 
-<BaseLayout title={`Blog pagina ${page} - Mijn Tuin Producten`} description="Lees de laatste blogs over tuinieren, planten en tuinproducten.">
-  <section class="blog-hero"><div class="container"><h1 class="blog-hero__title">Blog</h1><p class="blog-hero__subtitle">De laatste tips, trends en reviews voor mensen met groene vingers</p></div></section>
-  <BlogListing posts={posts} currentPage={page} totalPages={totalPages} />
-</BaseLayout>
+{type === 'post' && Content ? (
+  <BlogPostLayout entry={entry}><Content /></BlogPostLayout>
+) : (
+  <BaseLayout
+    title={`Blog pagina ${page} - Mijn Tuin Producten`}
+    description="Lees de laatste blogs over tuinieren, planten en tuinproducten."
+  >
+    <section class="blog-hero">
+      <div class="container">
+        <h1 class="blog-hero__title">Blog</h1>
+        <p class="blog-hero__subtitle">De laatste tips, trends en reviews voor mensen met groene vingers</p>
+      </div>
+    </section>
+    <BlogListing posts={posts} currentPage={page} totalPages={totalPages} />
+  </BaseLayout>
+)}
 
 <style>
   .blog-hero { background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 100%); padding: 4rem 0; text-align: center; }
