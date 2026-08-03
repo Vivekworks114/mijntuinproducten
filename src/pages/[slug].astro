@@ -1,43 +1,62 @@
 ---
 import ScrapedContentPage from '../components/ScrapedContentPage.astro';
+import BlogPostLayout from '../layouts/BlogPostLayout.astro';
+import { getCollection, render } from 'astro:content';
 import { readdirSync, readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 
-export function getStaticPaths() {
+const reserved = new Set([
+  'blog', 'tuincentrum', 'planten', 'decoratie', 'gereedschap', 'overig',
+  'planten-zaden', 'tuingerei', 'verbouwing', 'sitemap', 'plant',
+  'planten-overzicht', 'images',
+]);
+
+export async function getStaticPaths() {
+  const reserved = new Set(['blog', 'tuincentrum', 'planten', 'decoratie', 'gereedschap', 'overig', 'planten-zaden', 'tuingerei', 'verbouwing', 'sitemap', 'plant', 'planten-overzicht', 'images']);
   const dataDir = join(process.cwd(), 'src/data/scraped/bedrijf');
-  if (!existsSync(dataDir)) return [];
-  const reserved = new Set([
-    'blog', 'tuincentrum', 'planten', 'decoratie', 'gereedschap', 'overig',
-    'planten-zaden', 'tuingerei', 'verbouwing', 'sitemap', 'plant',
-    'planten-overzicht', 'images',
-  ]);
-  return readdirSync(dataDir)
-    .filter((f) => f.endsWith('.json'))
-    .map((f) => f.replace(/\.json$/, ''))
-    .filter((slug) => !reserved.has(slug) && !slug.startsWith('beste-'))
-    .map((slug) => ({ params: { slug }, props: { file: `${slug}.json` } }));
+  const companySlugs = existsSync(dataDir)
+    ? readdirSync(dataDir).filter((file) => file.endsWith('.json')).map((file) => file.replace(/\.json$/, ''))
+    : [];
+  const blogEntries = await getCollection('blog');
+  const blogSlugs = new Set(blogEntries.map((entry) => entry.id));
+
+  return [
+    ...companySlugs
+      .filter((slug) => !reserved.has(slug) && !slug.startsWith('beste-') && !blogSlugs.has(slug))
+      .map((slug) => ({ params: { slug }, props: { type: 'company', file: `${slug}.json` } })),
+    ...blogEntries
+      .filter((entry) => !reserved.has(entry.id) && !entry.id.startsWith('beste-') && !companySlugs.includes(entry.id) && !entry.id.includes('/'))
+      .map((entry) => ({ params: { slug: entry.id }, props: { type: 'blog', entry } })),
+  ];
 }
 
-const { file } = Astro.props;
-const data = JSON.parse(
-  readFileSync(join(process.cwd(), 'src/data/scraped/bedrijf', file), 'utf-8')
-);
+const { type, file, entry } = Astro.props;
+let Content: Awaited<ReturnType<typeof render>>['Content'] | undefined;
+let data: any;
+let html = '';
 
-let html = data.contentHtml as string;
-html = html.replace(/<h1[\s\S]*?<\/h1>/i, '');
-html = html.replace(/<p>\s*Laatst bijgewerkt:[\s\S]*?<\/p>/i, '');
+if (type === 'blog') {
+  ({ Content } = await render(entry));
+} else {
+  data = JSON.parse(readFileSync(join(process.cwd(), 'src/data/scraped/bedrijf', file), 'utf-8'));
+  html = (data.contentHtml as string).replace(/<h1[\s\S]*?<\/h1>/i, '').replace(/<p>\s*Laatst bijgewerkt:[\s\S]*?<\/p>/i, '');
+}
 ---
 
-<ScrapedContentPage
-  title={data.title}
-  description={data.description}
-  h1={data.h1}
-  date={data.date}
-  breadcrumb={[
-    { label: 'Home', href: '/' },
-    { label: 'Tuincentrum', href: '/tuincentrum/' },
-    { label: data.h1 || data.title },
-  ]}
-  contentHtml={html}
-  showToc={true}
-/>
+{type === 'blog' && Content ? (
+  <BlogPostLayout entry={entry}><Content /></BlogPostLayout>
+) : (
+  <ScrapedContentPage
+    title={data.title}
+    description={data.description}
+    h1={data.h1}
+    date={data.date}
+    breadcrumb={[
+      { label: 'Home', href: '/' },
+      { label: 'Tuincentrum', href: '/tuincentrum/' },
+      { label: data.h1 || data.title },
+    ]}
+    contentHtml={html}
+    showToc={true}
+  />
+)}

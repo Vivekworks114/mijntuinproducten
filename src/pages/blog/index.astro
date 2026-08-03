@@ -1,83 +1,20 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import BlogCard from '../../components/BlogCard.astro';
-import { fallbackImage } from '../../data/fallback-images';
+import BlogListing from '../../components/BlogListing.astro';
 import { getCollection } from 'astro:content';
 
-const posts = (await getCollection('blog')).sort(
-  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
-);
+const PAGE_SIZE = 12;
+const posts = (await getCollection('blog')).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const totalPages = Math.ceil(posts.length / PAGE_SIZE);
 ---
 
 <BaseLayout title="Blog - Mijn Tuin Producten" description="Lees de laatste blogs over tuinieren, planten en tuinproducten.">
-  <section class="blog-hero">
-    <div class="container">
-      <h1 class="blog-hero__title">Blog</h1>
-      <p class="blog-hero__subtitle">De laatste tips, trends en reviews voor mensen met groene vingers</p>
-    </div>
-  </section>
-
-  <section class="blog-listing">
-    <div class="container">
-      <p class="blog-listing__count">{posts.length} artikelen</p>
-      <div class="blog-listing__grid">
-        {posts.map((post) => (
-          <BlogCard
-            title={post.data.title}
-            excerpt={post.data.description}
-            image={post.data.featuredImage || fallbackImage(post.id)}
-            date={post.data.pubDate.toLocaleDateString('nl-NL', { year: 'numeric', month: 'long', day: 'numeric' })}
-            href={`/blog/${post.id}/`}
-          />
-        ))}
-      </div>
-    </div>
-  </section>
+  <section class="blog-hero"><div class="container"><h1 class="blog-hero__title">Blog</h1><p class="blog-hero__subtitle">De laatste tips, trends en reviews voor mensen met groene vingers</p></div></section>
+  <BlogListing posts={posts.slice(0, PAGE_SIZE)} currentPage={1} totalPages={totalPages} />
 </BaseLayout>
 
 <style>
-  .blog-hero {
-    background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 100%);
-    padding: 4rem 0;
-    text-align: center;
-  }
-
-  .blog-hero__title {
-    color: var(--color-white);
-    margin-bottom: 0.75rem;
-  }
-
-  .blog-hero__subtitle {
-    color: rgba(255, 255, 255, 0.8);
-    font-size: 1.1rem;
-  }
-
-  .blog-listing {
-    padding: 4rem 0;
-  }
-
-  .blog-listing__count {
-    text-align: center;
-    color: var(--color-text-muted);
-    margin-bottom: 2rem;
-    font-size: 0.9rem;
-  }
-
-  .blog-listing__grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-  }
-
-  @media (min-width: 600px) {
-    .blog-listing__grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-
-  @media (min-width: 1024px) {
-    .blog-listing__grid {
-      grid-template-columns: repeat(3, 1fr);
-    }
-  }
+  .blog-hero { background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 100%); padding: 4rem 0; text-align: center; }
+  .blog-hero__title { color: var(--color-white); margin-bottom: 0.75rem; }
+  .blog-hero__subtitle { color: rgba(255, 255, 255, 0.8); font-size: 1.1rem; }
 </style>
