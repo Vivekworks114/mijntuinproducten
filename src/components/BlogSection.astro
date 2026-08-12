@@ -1,6 +1,6 @@
 ---
 import BlogCard from './BlogCard.astro';
-import { fallbackImage } from '../data/fallback-images';
+import { getBlogCardImage } from '../lib/media';
 import { getCollection } from 'astro:content';
 
 const posts = (await getCollection('blog')).sort(
@@ -16,7 +16,7 @@ const posts = (await getCollection('blog')).sort(
         <BlogCard
           title={post.data.title}
           excerpt={post.data.description}
-          image={post.data.featuredImage || fallbackImage(post.id)}
+          image={getBlogCardImage(post.data, post.id)}
           date={post.data.pubDate.toLocaleDateString('nl-NL', { year: 'numeric', month: 'long', day: 'numeric' })}
           href={`/${post.id}/`}
         />

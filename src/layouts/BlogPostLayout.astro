@@ -1,6 +1,8 @@
 ---
 import BaseLayout from './BaseLayout.astro';
-import { fallbackImage } from '../data/fallback-images';
+import BlogCard from '../components/BlogCard.astro';
+import { getCollection } from 'astro:content';
+import { getBlogCardImage, getBlogHeroImage, hasBlogCover } from '../lib/media';
 
 interface Props {
   entry: {
@@ -12,208 +14,448 @@ interface Props {
       categories?: string[];
       tags?: string[];
       featuredImage?: string;
+      heroImage?: string;
+      image?: string;
     };
     id: string;
+    body?: string;
   };
 }
 
 const { entry } = Astro.props;
-const { title, description, pubDate, author, categories, featuredImage } = entry.data;
-const heroImage = featuredImage || fallbackImage(entry.id);
+const { title, description, pubDate, author, categories } = entry.data;
+const heroImage = getBlogHeroImage(entry.data, entry.id);
+const showCover = hasBlogCover(entry.data) || Boolean(heroImage);
 
 const formattedDate = pubDate.toLocaleDateString('nl-NL', {
   year: 'numeric',
   month: 'long',
   day: 'numeric',
 });
+
+const wordCount = `${title} ${description} ${entry.body || ''}`
+  .trim()
+  .split(/\s+/)
+  .filter(Boolean).length;
+const readingMinutes = Math.max(1, Math.ceil(wordCount / 200));
+
+const visibleCategories = (categories || []).filter(
+  (c) => c.toLowerCase() !== 'uncategorized' && c.toLowerCase() !== 'blog',
+);
+
+const allPosts = (await getCollection('blog')).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+const categorySet = new Set(visibleCategories);
+const relatedPosts = allPosts
+  .filter((p) => p.id !== entry.id)
+  .map((p) => {
+    let score = 0;
+    for (const c of p.data.categories || []) {
+      if (categorySet.has(c)) score += 2;
+    }
+    return { post: p, score };
+  })
+  .sort(
+    (a, b) =>
+      b.score - a.score || b.post.data.pubDate.valueOf() - a.post.data.pubDate.valueOf(),
+  )
+  .slice(0, 3)
+  .map((x) => x.post);
 ---
 
-<BaseLayout title={`${title} - Mijn Tuin Producten`} description={description}>
-  <article class="blog-post">
-    <header class="blog-post__header">
-      <div class="container">
-        <nav class="blog-post__breadcrumb" aria-label="Breadcrumb">
+<BaseLayout title={`${title} - Mijn Tuin Producten`} description={description} ogImage={heroImage}>
+  <article class="article">
+    <div class="container">
+      <div class="article__column">
+        <nav class="article__crumb" aria-label="Breadcrumb">
           <a href="/">Home</a>
-          <span>/</span>
+          <span aria-hidden="true">/</span>
           <a href="/blog/">Blog</a>
-          <span>/</span>
-          <span>{title}</span>
+          <span aria-hidden="true">/</span>
+          <span class="article__crumb-current">{title}</span>
         </nav>
-        <h1 class="blog-post__title">{title}</h1>
-        <div class="blog-post__meta">
-          <time class="blog-post__date" datetime={pubDate.toISOString()}>{formattedDate}</time>
-          {author && <span class="blog-post__author">door {author}</span>}
-          {categories && categories.length > 0 && (
-            <span class="blog-post__categories">
-              {categories.map((cat) => (
-                <span class="blog-post__category">{cat}</span>
-              ))}
-            </span>
-          )}
-        </div>
-      </div>
-    </header>
 
-    <div class="blog-post__featured">
-      <div class="container">
-        <img src={heroImage} alt={title} class="blog-post__image" loading="eager" />
-      </div>
-    </div>
+        {
+          showCover && (
+            <figure class="article__cover">
+              <img
+                src={heroImage}
+                alt={title}
+                width="1200"
+                height="675"
+                loading="eager"
+                decoding="async"
+                fetchpriority="high"
+              />
+            </figure>
+          )
+        }
 
-    <div class="blog-post__body">
-      <div class="container">
-        <div class="blog-post__content">
+        <header class="article__header">
+          {
+            visibleCategories.length > 0 && (
+              <div class="article__pills">
+                {visibleCategories.slice(0, 3).map((cat) => (
+                  <span class="article__pill">{cat}</span>
+                ))}
+              </div>
+            )
+          }
+
+          <h1 class="article__title">{title}</h1>
+
+          {description && <p class="article__lead">{description}</p>}
+
+          <div class="article__meta">
+            <time datetime={pubDate.toISOString()}>{formattedDate}</time>
+            <span class="article__dot" aria-hidden="true"></span>
+            <span>{readingMinutes} min lezen</span>
+            {author && author !== 'admin' && (
+              <>
+                <span class="article__dot" aria-hidden="true"></span>
+                <span>Door {author}</span>
+              </>
+            )}
+          </div>
+        </header>
+
+        <div class="article__prose">
           <slot />
         </div>
+
+        <div class="article__footer-nav">
+          <a href="/blog/" class="article__back">← Terug naar blog</a>
+        </div>
       </div>
     </div>
+
+    {
+      relatedPosts.length > 0 && (
+        <section class="article__related" aria-labelledby="related-heading">
+          <div class="container">
+            <div class="article__related-head">
+              <p class="article__related-eyebrow">Verder lezen</p>
+              <h2 id="related-heading">Gerelateerde artikelen</h2>
+            </div>
+            <div class="article__related-grid">
+              {relatedPosts.map((post) => (
+                <BlogCard
+                  title={post.data.title}
+                  excerpt={post.data.description}
+                  image={getBlogCardImage(post.data, post.id)}
+                  date={post.data.pubDate.toLocaleDateString('nl-NL', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                  })}
+                  href={`/${post.id}/`}
+                />
+              ))}
+            </div>
+          </div>
+        </section>
+      )
+    }
   </article>
 </BaseLayout>
 
 <style>
-  .blog-post__header {
-    background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 100%);
-    padding: 3rem 0 2.5rem;
+  .article {
+    padding: clamp(1.25rem, 3vw, 2rem) 0 clamp(2.5rem, 5vw, 4rem);
+    background:
+      radial-gradient(ellipse 80% 40% at 10% -10%, rgba(9, 139, 84, 0.08), transparent 55%),
+      radial-gradient(ellipse 60% 35% at 90% 0%, rgba(248, 208, 152, 0.18), transparent 50%),
+      linear-gradient(180deg, #f4f8f4 0%, var(--color-white) 28%, var(--color-white) 100%);
   }
 
-  .blog-post__breadcrumb {
+  /* One shared column so cover + title + body share the same left edge */
+  .article__column {
+    max-width: 46rem;
+    margin-inline: auto;
+    animation: article-rise 0.55s ease both;
+  }
+
+  .article__crumb {
     display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.85rem;
-    color: rgba(255, 255, 255, 0.7);
-    margin-bottom: 1.5rem;
     flex-wrap: wrap;
-  }
-
-  .blog-post__breadcrumb a {
-    color: rgba(255, 255, 255, 0.7);
-    transition: color var(--transition-fast);
-  }
-
-  .blog-post__breadcrumb a:hover {
-    color: var(--color-white);
-  }
-
-  .blog-post__title {
-    color: var(--color-white);
-    font-size: clamp(1.5rem, 4vw, 2.5rem);
-    margin-bottom: 1rem;
-    max-width: 800px;
-  }
-
-  .blog-post__meta {
-    display: flex;
     align-items: center;
-    gap: 1rem;
-    flex-wrap: wrap;
-    font-size: 0.9rem;
-    color: rgba(255, 255, 255, 0.7);
+    gap: 0.45rem;
+    margin-bottom: clamp(1rem, 2.5vw, 1.35rem);
+    font-size: 0.8125rem;
+    color: var(--color-text-muted);
   }
 
-  .blog-post__author {
-    font-style: italic;
+  .article__crumb a {
+    color: var(--color-primary-light);
+    font-weight: 500;
   }
 
-  .blog-post__category {
-    display: inline-block;
-    padding: 0.2rem 0.6rem;
-    background: rgba(255, 255, 255, 0.15);
-    border-radius: var(--radius-sm);
-    font-size: 0.8rem;
-  }
-
-  .blog-post__featured {
-    padding: 2rem 0;
-    background: var(--color-bg-light);
-  }
-
-  .blog-post__image {
-    width: 100%;
-    max-width: 800px;
-    height: auto;
-    aspect-ratio: 16/9;
-    object-fit: cover;
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-lg);
-  }
-
-  .blog-post__body {
-    padding: 3rem 0 4rem;
-  }
-
-  .blog-post__content {
-    max-width: 750px;
-    font-size: 1.05rem;
-    line-height: 1.8;
-  }
-
-  .blog-post__content :global(h2) {
-    font-family: var(--font-heading);
-    font-size: 1.5rem;
-    margin: 2.5rem 0 1rem;
+  .article__crumb a:hover {
     color: var(--color-primary);
   }
 
-  .blog-post__content :global(h3) {
+  .article__crumb-current {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .article__cover {
+    margin: 0 0 clamp(1.5rem, 3vw, 2rem);
+    overflow: hidden;
+    border-radius: clamp(12px, 2vw, 18px);
+    aspect-ratio: 16 / 9;
+    background: var(--color-bg-section);
+    box-shadow:
+      0 18px 48px rgba(0, 45, 24, 0.14),
+      0 2px 0 rgba(255, 255, 255, 0.4) inset;
+    border: 1px solid rgba(0, 62, 33, 0.08);
+  }
+
+  .article__cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  .article__header {
+    margin-bottom: clamp(1.5rem, 3vw, 2.25rem);
+  }
+
+  .article__pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .article__pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.35rem 0.75rem;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+    background: rgba(9, 139, 84, 0.1);
+    border: 1px solid rgba(9, 139, 84, 0.18);
+    border-radius: 999px;
+  }
+
+  .article__title {
+    margin: 0 0 0.85rem;
     font-family: var(--font-heading);
-    font-size: 1.25rem;
-    margin: 2rem 0 0.75rem;
+    font-size: clamp(2rem, 4.5vw, 3.15rem);
+    line-height: 1.12;
+    letter-spacing: 0.01em;
     color: var(--color-primary-dark);
   }
 
-  .blog-post__content :global(p) {
-    margin-bottom: 1.25rem;
+  .article__lead {
+    margin: 0 0 1.35rem;
+    font-size: clamp(1.05rem, 1.6vw, 1.175rem);
+    line-height: 1.7;
     color: var(--color-text-light);
   }
 
-  .blog-post__content :global(a) {
-    color: var(--color-primary);
-    text-decoration: underline;
-    text-underline-offset: 2px;
-    transition: color var(--transition-fast);
+  .article__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.55rem 0.85rem;
+    padding-top: 1.1rem;
+    border-top: 1px solid rgba(0, 62, 33, 0.1);
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
   }
 
-  .blog-post__content :global(a:hover) {
+  .article__dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--color-secondary);
+    opacity: 0.55;
+  }
+
+  .article__prose {
+    font-size: 1.0625rem;
+    line-height: 1.85;
+    color: var(--color-text);
+  }
+
+  .article__prose :global(> :first-child) {
+    margin-top: 0;
+  }
+
+  .article__prose :global(> p:first-of-type) {
+    font-size: 1.125rem;
+    line-height: 1.8;
+    color: #3d3d3d;
+  }
+
+  .article__prose :global(h2),
+  .article__prose :global(h3),
+  .article__prose :global(h4) {
+    scroll-margin-top: 6rem;
+    font-family: var(--font-heading);
+    color: var(--color-primary-dark);
+  }
+
+  .article__prose :global(h2) {
+    margin: 2.75rem 0 1rem;
+    padding-bottom: 0.55rem;
+    font-size: clamp(1.45rem, 2.5vw, 1.85rem);
+    border-bottom: 2px solid rgba(9, 139, 84, 0.15);
+  }
+
+  .article__prose :global(h3) {
+    margin: 2rem 0 0.75rem;
+    font-size: clamp(1.2rem, 2vw, 1.4rem);
+  }
+
+  .article__prose :global(p) {
+    margin-bottom: 1.3rem;
+    color: var(--color-text-light);
+  }
+
+  .article__prose :global(a) {
+    color: var(--color-primary-light);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-thickness: 1px;
+  }
+
+  .article__prose :global(a:hover) {
     color: var(--color-secondary);
   }
 
-  .blog-post__content :global(ul),
-  .blog-post__content :global(ol) {
-    margin-bottom: 1.25rem;
-    padding-left: 1.5rem;
+  .article__prose :global(ul),
+  .article__prose :global(ol) {
+    margin: 0 0 1.4rem;
+    padding-left: 1.35rem;
   }
 
-  .blog-post__content :global(li) {
-    margin-bottom: 0.5rem;
+  .article__prose :global(li) {
+    margin-bottom: 0.55rem;
     color: var(--color-text-light);
   }
 
-  .blog-post__content :global(ul li) {
+  .article__prose :global(ul li) {
     list-style: disc;
   }
 
-  .blog-post__content :global(ol li) {
+  .article__prose :global(ol li) {
     list-style: decimal;
   }
 
-  .blog-post__content :global(img) {
+  .article__prose :global(img) {
     width: 100%;
     height: auto;
+    margin: 2rem 0;
     border-radius: var(--radius-md);
-    margin: 1.5rem 0;
+    border: 1px solid rgba(0, 62, 33, 0.08);
+    box-shadow: var(--shadow-sm);
   }
 
-  .blog-post__content :global(blockquote) {
-    border-left: 4px solid var(--color-primary);
-    padding-left: 1rem;
-    margin: 1.5rem 0;
+  .article__prose :global(blockquote) {
+    margin: 2rem 0;
+    padding: 1.25rem 1.5rem;
+    border-left: 4px solid var(--color-accent);
+    background: linear-gradient(90deg, rgba(9, 139, 84, 0.06), transparent);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
     font-style: italic;
     color: var(--color-text-light);
   }
 
-  .blog-post__content :global(strong) {
+  .article__prose :global(strong) {
     color: var(--color-text);
     font-weight: 600;
+  }
+
+  .article__footer-nav {
+    margin-top: 2.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(0, 62, 33, 0.1);
+  }
+
+  .article__back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    transition: gap var(--transition-fast), color var(--transition-fast);
+  }
+
+  .article__back:hover {
+    color: var(--color-secondary);
+    gap: 0.55rem;
+  }
+
+  .article__related {
+    padding: clamp(2.5rem, 5vw, 4rem) 0;
+    background:
+      linear-gradient(180deg, rgba(245, 249, 245, 0.5) 0%, var(--color-bg-section) 100%);
+    border-top: 1px solid rgba(0, 62, 33, 0.08);
+  }
+
+  .article__related-head {
+    margin-bottom: 1.75rem;
+  }
+
+  .article__related-eyebrow {
+    margin: 0 0 0.35rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-secondary);
+  }
+
+  .article__related h2 {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    color: var(--color-primary-dark);
+  }
+
+  .article__related-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  @media (min-width: 600px) {
+    .article__related-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .article__related-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  @keyframes article-rise {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .article__column {
+      animation: none;
+    }
   }
 </style>
